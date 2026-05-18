@@ -1,60 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>SDA Membership System</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Naigobya SDA Membership System</title>
+
+  <link rel="stylesheet" href="css/style.css">
 </head>
+<body>
 
-<body style="margin:0;font-family:Arial;background:#0f172a;color:white;">
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">
+      ⛪ Naigobya SDA
+    </div>
 
-<!-- NAV -->
-<div style="display:flex;justify-content:space-between;padding:15px;background:#111827;">
-  <h3>⛪ Naigobya SDA</h3>
-  <div>
-    <a href="index.html" style="color:white;margin:10px;">Home</a>
-    <a href="register.html" style="color:white;margin:10px;">Register</a>
-    <a href="church-members.html" style="color:white;margin:10px;">Members</a>
-    <a href="admin-login.html" style="color:white;margin:10px;">Admin</a>
-  </div>
-</div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="register.html">Register</a>
+      <a href="church-members.html">Members</a>
+      <a href="admin-login.html">Admin</a>
+    </div>
+  </nav>
 
-<!-- HERO -->
-<div style="text-align:center;padding:80px 20px;">
-  <h1>Church Membership System</h1>
-  <p>Digital SDA membership management for registration and approval</p>
+  <!-- HERO SECTION -->
+  <section class="hero">
 
-  <a href="register.html" style="background:#22c55e;padding:12px 20px;color:white;text-decoration:none;border-radius:8px;">
-    Register Member
-  </a>
+    <div class="overlay"></div>
 
-  <a href="admin-login.html" style="background:#1e293b;padding:12px 20px;color:white;text-decoration:none;border-radius:8px;">
-    Admin Login
-  </a>
-</div>
+    <div class="hero-content">
 
-<!-- FEATURES -->
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;padding:40px;">
+      <h1>
+        SDA Membership System
+      </h1>
 
-  <div style="background:#1e293b;padding:20px;border-radius:10px;">
-    🔐 Secure Firebase System
-  </div>
+      <p>
+        A modern digital church membership management platform
+        for registration, administration, and member organization.
+      </p>
 
-  <div style="background:#1e293b;padding:20px;border-radius:10px;">
-    👨‍💼 Elder Approval Required
-  </div>
+      <div class="hero-buttons">
 
-  <div style="background:#1e293b;padding:20px;border-radius:10px;">
-    🔎 Search Members Easily
-  </div>
+        <a href="register.html" class="btn green">
+          Register Member
+        </a>
 
-</div>
+        <a href="admin-login.html" class="btn dark">
+          Admin Login
+        </a>
 
-<!-- FOOTER -->
-<div style="text-align:center;padding:20px;background:#111827;">
-© 2026 SDA Church System
-</div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+
+    <div class="card">
+      <h2>🔐 Secure</h2>
+      <p>
+        Firebase-powered secure authentication and storage.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>👨‍💼 Elder Approval</h2>
+      <p>
+        Church elders approve and manage member registrations.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>🔎 Search Members</h2>
+      <p>
+        Easily search and organize church member records.
+      </p>
+    </div>
+
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about">
+
+    <h2>About This Vision</h2>
+
+    <p>
+      This system was created to support church organization,
+      simplify membership management, and promote digital
+      innovation within the SDA church community.
+    </p>
+
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+
+    <p>
+      © 2026 Naigobya SDA Membership System
+    </p>
+
+    <p>
+      Developed by Nicholas Bagenda 💻
+    </p>
+
+  </footer>
 
 </body>
 </html>
