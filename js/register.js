@@ -1,13 +1,14 @@
-import { auth, db, storage } from "./firebase.js";
+import { auth } from "./firebase.js";
+import { db, storage } from "./firebase.js";
 
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
-import { ref, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-import { ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
+import { ref as sRef } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
 
 
-// REGISTER FUNCTION
 window.registerUser = async function () {
 
   const name = document.getElementById("name").value;
@@ -17,42 +18,32 @@ window.registerUser = async function () {
   const password = document.getElementById("password").value;
   const photo = document.getElementById("photo").files[0];
 
-  if (!name || !phone || !village || !email || !password) {
-    alert("Please fill all fields");
-    return;
-  }
-
   try {
 
-    // 1. Create Auth User
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCred.user;
 
-    // 2. Upload Photo
     let photoURL = "";
 
     if (photo) {
-      const photoRef = sRef(storage, "members/" + user.uid);
-      await uploadBytes(photoRef, photo);
-      photoURL = await getDownloadURL(photoRef);
+      const imgRef = sRef(storage, "members/" + user.uid);
+      await uploadBytes(imgRef, photo);
+      photoURL = await getDownloadURL(imgRef);
     }
 
-    // 3. Save to Realtime Database
-    await set(ref(db, "members/" + user.uid), {
-      name: name,
-      phone: phone,
-      village: village,
-      email: email,
-      photo: photoURL,
-      status: "pending",
-      role: "member"
+    await setDoc(doc(db, "members", user.uid), {
+      name,
+      phone,
+      village,
+      email,
+      photoURL,
+      status: "pending"
     });
 
-    alert("Registration successful! Waiting for approval.");
-
+    alert("Registered successfully!");
     window.location.href = "index.html";
 
-  } catch (error) {
-    alert(error.message);
+  } catch (err) {
+    alert(err.message);
   }
 };
