@@ -1,34 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Register Member</title>
+<title>Register</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body style="background:#0f172a; color:white; font-family:Arial;">
+<body style="background:#0f172a;color:white;text-align:center;">
 
-<h2 style="text-align:center;">⛪ Church Member Registration</h2>
+<h2>Register Member</h2>
 
-<div style="max-width:500px;margin:auto;padding:20px;">
+<input id="name" placeholder="Name"><br><br>
+<input id="phone" placeholder="Phone"><br><br>
+<input id="village" placeholder="Village"><br><br>
+<input id="email" placeholder="Email"><br><br>
+<input id="password" placeholder="Password"><br><br>
+<input type="file" id="photo"><br><br>
 
-  <input type="text" id="name" placeholder="Full Name" style="width:100%;padding:10px;margin:5px;"><br>
-
-  <input type="text" id="phone" placeholder="Phone Number" style="width:100%;padding:10px;margin:5px;"><br>
-
-  <input type="text" id="village" placeholder="Village / District" style="width:100%;padding:10px;margin:5px;"><br>
-
-  <input type="email" id="email" placeholder="Email" style="width:100%;padding:10px;margin:5px;"><br>
-
-  <input type="password" id="password" placeholder="Password" style="width:100%;padding:10px;margin:5px;"><br>
-
-  <input type="file" id="photo"><br><br>
-
-  <button onclick="registerUser()" style="width:100%;padding:12px;background:#22c55e;color:white;border:none;">
-    Register
-  </button>
-
-</div>
+<button onclick="registerUser()">Register</button>
 
 <script type="module" src="js/register.js"></script>
 
