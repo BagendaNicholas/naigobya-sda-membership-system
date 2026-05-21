@@ -1,183 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Register Member | SDA Church</title>
-<link rel="stylesheet" href="css/style.css">
-<style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0f172a;
-    color: white;
-}
-.navbar {
-    background: #111827;
-    padding: 15px 8%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.logo {
-    font-size: 20px;
-    font-weight: bold;
-    color: #22c55e;
-}
-.container {
-    max-width: 500px;
-    margin: 40px auto;
-    background: #1e293b;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.4);
-}
-.container h2 {
-    text-align: center;
-    margin-bottom: 25px;
-}
-.input-box {
-    margin-bottom: 15px;
-}
-.input-box input {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    background: #0f172a;
-    color: white;
-    outline: none;
-    box-sizing: border-box;
-}
-.file-box {
-    margin: 15px 0;
-}
-.file-box input {
-    color: white;
-}
-.preview {
-    text-align: center;
-    margin-top: 15px;
-    margin-bottom: 15px;
-}
-.preview img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #22c55e;
-    display: none;
-    margin: 0 auto;
-}
-button {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    background: #22c55e;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.3s;
-}
-button:hover {
-    opacity: 0.9;
-}
-#loading {
-    display: none;
-    text-align: center;
-    margin-top: 15px;
-    color: #22c55e;
-    font-weight: bold;
-}
-@media(max-width:768px) {
-    .container {
-        margin: 20px;
-        padding: 20px;
-    }
-}
-</style>
-</head>
-<body>
+// js/register.js
+import { auth, db } from "./firebase.js";
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-<div class="navbar">
-    <div class="logo">⛪ Naigobya SDA</div>
-</div>
+window.registerUser = async function () {
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const village = document.getElementById("village").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const photoString = document.getElementById("photoBase64String").value;
+  const loading = document.getElementById("loading");
 
-<div class="container">
-    <h2>Church Member Registration</h2>
+  if (!name || !phone || !village || !email || !password) {
+    alert("⚠️ Please fill all fields.");
+    return;
+  }
 
-    <div class="input-box">
-        <input type="text" id="name" placeholder="Full Name">
-    </div>
+  if (password.length < 6) {
+    alert("⚠️ Password must be at least 6 characters.");
+    return;
+  }
 
-    <div class="input-box">
-        <input type="text" id="phone" placeholder="Phone Number">
-    </div>
+  try {
+    loading.style.display = "block";
 
-    <div class="input-box">
-        <input type="text" id="village" placeholder="Village / District">
-    </div>
+    // Create user authentication node
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCred.user;
 
-    <div class="input-box">
-        <input type="email" id="email" placeholder="Email Address">
-    </div>
+    // Save user metrics directly into Firestore, converting photoString into text field data
+    await setDoc(doc(db, "members", user.uid), {
+      uid: user.uid,
+      name: name,
+      phone: phone,
+      address: village, 
+      email: email,
+      photoURL: photoString || "", // Injects Base64 data directly, bypassing Cloud Storage rules entirely
+      status: "pending",
+      role: "member",
+      createdAt: new Date().toISOString()
+    });
 
-    <div class="input-box">
-        <input type="password" id="password" placeholder="Password">
-    </div>
+    alert("✅ Registration Successful!");
+    window.location.href = "admin-dashboard.html";
 
-    <div class="file-box">
-        <label style="color: #cbd5e1; font-size: 0.9rem;">Select Profile Photo</label><br><br>
-        <input type="file" id="photo" accept="image/*">
-        <input type="hidden" id="photoBase64String" value="">
-    </div>
-
-    <div class="preview">
-        <img id="previewImage" alt="Profile Preview">
-    </div>
-
-    <button onclick="registerUser()">
-        Register Member
-    </button>
-
-    <div id="loading">
-        ⏳ Uploading Profile Photo & Registering...
-    </div>
-</div>
-
-<script>
-// Dynamic FileReader Engine with Base64 Conversion Storage
-const photoInput = document.getElementById("photo");
-const previewImage = document.getElementById("previewImage");
-const base64HiddenInput = document.getElementById("photoBase64String");
-
-photoInput.addEventListener("change", function(){
-    const file = this.files[0];
-    if (file) {
-        // Enforce the 2MB size cap right here on the client interface to protect Firestore limits
-        if (file.size > 1024 * 1024) { 
-            alert("⚠️ To keep registrations free, please choose an image smaller than 1MB.");
-            this.value = "";
-            previewImage.style.display = "none";
-            base64HiddenInput.value = "";
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function(e){
-            const imageString = e.target.result;
-            previewImage.src = imageString;
-            previewImage.style.display = "block";
-            // Store the text string inside our hidden element container so your external script can catch it!
-            base64HiddenInput.value = imageString;
-        }
-        reader.readAsDataURL(file);
-    }
-});
-</script>
-
-<script type="module" src="js/register.js"></script>
-</body>
-</html>
+  } catch (error) {
+    console.error(error);
+    alert(error.message);
+  } finally {
+    loading.style.display = "none";
+  }
+};
