@@ -1,151 +1,128 @@
+// js/dashboard.js
 import { auth, db } from "./firebase.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { collection, onSnapshot, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-import {
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+const LOGGED_ADMIN_EMAIL = "nicholasbagenda@gmail.com";
+let deactivateSnapshotStream = null;
 
-import {
-  collection,
-  getDocs,
-  updateDoc,
-  doc
-} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
-
-
-// ADMIN EMAIL
-const ADMIN_EMAIL = "nicholasbagenda@gmail.com";
-
-let membersCache = [];
-
-
-// AUTH CHECK
-onAuthStateChanged(auth, async (user) => {
-
-  if (!user) {
-    window.location.href = "admin-login.html";
-    return;
-  }
-
-  if (user.email !== ADMIN_EMAIL) {
-    alert("❌ Access Denied");
-    window.location.href = "index.html";
-    return;
-  }
-
-  loadMembers();
-});
-
-
-// LOGOUT
-window.logoutAdmin = async function () {
-  await signOut(auth);
-  window.location.href = "index.html";
-};
-
-
-// LOAD MEMBERS FROM FIRESTORE
-async function loadMembers() {
-
-  const membersList = document.getElementById("membersList");
-  membersList.innerHTML = "";
-
-  membersCache = [];
-
-  let total = 0;
-  let pending = 0;
-  let approved = 0;
-
-  const snapshot = await getDocs(collection(db, "members"));
-
-  snapshot.forEach((docSnap) => {
-
-    const data = docSnap.data();
-    const id = docSnap.id;
-
-    membersCache.push({ id, ...data });
-
-    total++;
-
-    if (data.status === "pending") pending++;
-    if (data.status === "approved") approved++;
-
-    const card = document.createElement("div");
-    card.className = "card";
-
-    card.innerHTML = `
-      <div style="text-align:center">
-
-        <img src="${data.photoURL || 'https://via.placeholder.com/80'}"
-        style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
-
-        <h3>${data.name || "No Name"}</h3>
-        <p>${data.email || "No Email"}</p>
-        <p>${data.phone || "No Phone"}</p>
-        <p>${data.address || ""}</p>
-
-        <p>Status: <b>${data.status || "pending"}</b></p>
-
-        <button onclick="approveMember('${id}')"
-        style="background:#16a34a;color:white;margin-top:8px;">
-          ✅ Approve
-        </button>
-
-        <button onclick="rejectMember('${id}')"
-        style="background:red;color:white;margin-top:8px;">
-          ❌ Reject
-        </button>
-
-      </div>
-    `;
-
-    membersList.appendChild(card);
-  });
-
-  // UPDATE STATS
-  document.getElementById("totalMembers").innerText = total;
-  document.getElementById("pendingMembers").innerText = pending;
-  document.getElementById("approvedMembers").innerText = approved;
+// Target the stats grid to inject an error display dynamically if things fail
+function displayUIMessage(message, isError = false) {
+    let msgBox = document.getElementById("dbErrorMessage");
+    if (!msgBox) {
+        msgBox = document.createElement("p");
+        msgBox.id = "dbErrorMessage";
+        document.querySelector(".container").insertBefore(msgBox, document.getElementById("stats"));
+    }
+    msgBox.style.cssText = `color: ${isError ? '#ff4444' : '#00ff88'}; font-weight: bold; text-align: center; margin: 15px 0;`;
+    msgBox.innerText = message;
 }
 
-
-// APPROVE MEMBER
-window.approveMember = async function (id) {
-
-  await updateDoc(doc(db, "members", id), {
-    status: "approved"
-  });
-
-  loadMembers();
-};
-
-
-// REJECT MEMBER
-window.rejectMember = async function (id) {
-
-  await updateDoc(doc(db, "members", id), {
-    status: "rejected"
-  });
-
-  loadMembers();
-};
-
-
-// SEARCH MEMBERS
-window.filterMembers = function () {
-
-  const value = document.getElementById("searchInput").value.toLowerCase();
-
-  const cards = document.querySelectorAll(".card");
-
-  cards.forEach((card) => {
-
-    const text = card.innerText.toLowerCase();
-
-    if (text.includes(value)) {
-      card.style.display = "block";
-    } else {
-      card.style.display = "none";
+// 1. AUTHENTICATION PROTECTION
+onAuthStateChanged(auth, (activeUser) => {
+    if (!activeUser) {
+        if (deactivateSnapshotStream) deactivateSnapshotStream();
+        displayUIMessage("Redirecting to login...", false);
+        window.location.href = "admin-login.html";
+        return;
     }
-  });
+
+    if (activeUser.email.toLowerCase() !== LOGGED_ADMIN_EMAIL.toLowerCase()) {
+        alert(`❌ Access Denied: ${activeUser.email} is not authorized.`);
+        window.location.href = "index.html";
+        return;
+    }
+
+    displayUIMessage("Authenticated! Loading church records...", false);
+    streamLiveChurchMembers();
+});
+
+// 2. REAL-TIME DATA FETCH
+function streamLiveChurchMembers() {
+    const listDisplayContainer = document.getElementById("membersList");
+    if (!listDisplayContainer) return;
+
+    try {
+        deactivateSnapshotStream = onSnapshot(collection(db, "members"), (liveSnapshot) => {
+            // If it connects successfully, clear any old error messages
+            displayUIMessage("", false);
+            listDisplayContainer.innerHTML = "";
+            
+            let counterTotal = 0;
+            let counterPending = 0;
+            let counterApproved = 0;
+
+            if (liveSnapshot.empty) {
+                displayUIMessage("Connected to Firebase, but no member documents found.", true);
+            }
+
+            liveSnapshot.forEach((documentObject) => {
+                const profileData = documentObject.data();
+                const uniqueProfileId = documentObject.id;
+
+                counterTotal++;
+                if (profileData.status === "pending") counterPending++;
+                if (profileData.status === "approved") counterApproved++;
+
+                const memberCardElement = document.createElement("div");
+                memberCardElement.className = "member-profile-card";
+                memberCardElement.style.cssText = "background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: center; margin-top: 15px;";
+
+                memberCardElement.innerHTML = `
+                    <img src="${profileData.photoURL || 'https://via.placeholder.com/80'}" 
+                         style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom: 12px; border: 2px solid #00f7ff;">
+                    <h3 style="margin: 5px 0; color: #fff;">${profileData.name || "Anonymous"}</h3>
+                    <p style="margin: 4px 0; font-size: 0.9rem; color: #ccc;">${profileData.email || "No Email"}</p>
+                    <p style="margin: 4px 0; font-size: 0.9rem; color: #ccc;">${profileData.phone || "No Phone"}</p>
+                    <p style="margin: 12px 0; font-size: 0.95rem;">Status: <b style="text-transform: uppercase; color: ${profileData.status === 'approved' ? '#16a34a' : '#ffaa00'}">${profileData.status || "pending"}</b></p>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                        <button onclick="approveMember('${uniqueProfileId}')" style="background:#16a34a; color:white; border:none; padding:8px 14px; border-radius:4px; cursor:pointer; font-weight:600;">✅ Approve</button>
+                        <button onclick="rejectMember('${uniqueProfileId}')" style="background:#dc2626; color:white; border:none; padding:8px 14px; border-radius:4px; cursor:pointer; font-weight:600;">❌ Reject</button>
+                    </div>
+                `;
+                listDisplayContainer.appendChild(memberCardElement);
+            });
+
+            document.getElementById("totalMembers").innerText = counterTotal;
+            document.getElementById("pendingMembers").innerText = counterPending;
+            document.getElementById("approvedMembers").innerText = counterApproved;
+
+            window.filterMembers();
+        }, (streamFetchError) => {
+            // This catches Permission Denied, Bad Config, or Network Blocks!
+            console.error("Firebase Sync Error:", streamFetchError);
+            displayUIMessage(`⚠️ Firebase Error: ${streamFetchError.message}`, true);
+        });
+    } catch (err) {
+        displayUIMessage(`⚠️ Script Error: ${err.message}`, true);
+    }
+}
+
+// 3. ACTION HANDLERS
+window.approveMember = async function (targetDocumentId) {
+    try {
+        await updateDoc(doc(db, "members", targetDocumentId), { status: "approved" });
+    } catch (e) { displayUIMessage(`Approval failed: ${e.message}`, true); }
+};
+
+window.rejectMember = async function (targetDocumentId) {
+    try {
+        await updateDoc(doc(db, "members", targetDocumentId), { status: "rejected" });
+    } catch (e) { displayUIMessage(`Rejection failed: ${e.message}`, true); }
+};
+
+window.filterMembers = function () {
+    const rawSearchInputValue = document.getElementById("searchInput").value.toLowerCase();
+    const targetedProfileElements = document.querySelectorAll(".member-profile-card");
+    targetedProfileElements.forEach((el) => {
+        el.style.display = el.innerText.toLowerCase().includes(rawSearchInputValue) ? "block" : "none";
+    });
+};
+
+window.logoutAdmin = async function (e) {
+    if (e) e.preventDefault();
+    if (deactivateSnapshotStream) deactivateSnapshotStream();
+    await signOut(auth);
+    window.location.href = "index.html";
 };
