@@ -40,7 +40,6 @@ function streamLiveChurchMembers() {
     const listDisplayContainer = document.getElementById("membersList");
     if (!listDisplayContainer) return;
 
-    // Safety fallback step: check if db object successfully loaded from firebase.js
     if (!db) {
         displayUIMessage("⚠️ Connection Error: The database object 'db' was not loaded from firebase.js. Check your import path scripts.", true);
         return;
@@ -48,7 +47,7 @@ function streamLiveChurchMembers() {
 
     try {
         deactivateSnapshotStream = onSnapshot(collection(db, "members"), (liveSnapshot) => {
-            displayUIMessage("", false); // Clear message boxes on success
+            displayUIMessage("", false); 
             listDisplayContainer.innerHTML = "";
             
             let counterTotal = 0;
@@ -62,6 +61,7 @@ function streamLiveChurchMembers() {
             liveSnapshot.forEach((documentObject) => {
                 const profileData = documentObject.data();
                 const uniqueProfileId = documentObject.id;
+                const memberName = profileData.name || "Anonymous Member";
 
                 counterTotal++;
                 if (profileData.status === "pending") counterPending++;
@@ -71,10 +71,13 @@ function streamLiveChurchMembers() {
                 memberCardElement.className = "member-profile-card";
                 memberCardElement.style.cssText = "background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: center; margin-top: 15px;";
 
+                // FIXED: Changed image src fallback to a high-availability profile initials generator
+                // Added an inline onerror fallback string pointing to a static user icon as an absolute backup layer
                 memberCardElement.innerHTML = `
-                    <img src="${profileData.photoURL || 'https://via.placeholder.com/80'}" 
-                         style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom: 12px; border: 2px solid #16a34a;">
-                    <h3 style="margin: 5px 0; color: #fff;">${profileData.name || "Anonymous Member"}</h3>
+                    <img src="${profileData.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(memberName)}`}" 
+                         style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom: 12px; border: 2px solid #16a34a;"
+                         onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png';">
+                    <h3 style="margin: 5px 0; color: #fff;">${memberName}</h3>
                     <p style="margin: 4px 0; font-size: 0.9rem; color: #ccc;">${profileData.email || "No Email"}</p>
                     <p style="margin: 4px 0; font-size: 0.9rem; color: #ccc;">${profileData.phone || "No Phone"}</p>
                     <p style="margin: 12px 0; font-size: 0.95rem;">Status: <b style="text-transform: uppercase; color: ${profileData.status === 'approved' ? '#16a34a' : '#ffaa00'}">${profileData.status || "pending"}</b></p>
