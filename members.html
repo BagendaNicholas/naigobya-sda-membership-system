@@ -1,1 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Profile Portal | SDA Church</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+}
+.navbar {
+    background: #111827;
+    padding: 15px 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #22c55e;
+}
+.nav-links a, .nav-links button {
+    color: white;
+    background: none;
+    border: none;
+    margin-left: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.nav-links button:hover { color: #ef4444; }
+.container {
+    max-width: 500px;
+    margin: 40px auto;
+    background: #1e293b;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+}
+.profile-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+.profile-pic {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #22c55e;
+    margin: 0 auto 15px auto;
+    display: block;
+}
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-top: 5px;
+}
+.status-pending { background: #b45309; color: #fef3c7; }
+.status-approved { background: #15803d; color: #dcfce7; }
+.status-rejected { background: #b91c1c; color: #fee2e2; }
+
+.input-box {
+    margin-bottom: 15px;
+}
+.input-box label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+    color: #cbd5e1;
+}
+.input-box input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #0f172a;
+    color: white;
+    outline: none;
+    box-sizing: border-box;
+}
+.file-box {
+    margin: 15px 0;
+}
+.file-box input { color: white; }
+button.btn-save {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #22c55e;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+button.btn-save:hover { opacity: 0.9; }
+#loadingOverlay {
+    display: none;
+    text-align: center;
+    margin-top: 15px;
+    color: #22c55e;
+    font-weight: bold;
+}
+@media(max-width:768px) {
+    .container { margin: 20px; padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo">⛪ Member Portal</div>
+    <div class="nav-links">
+        <a href="admin-dashboard.html" id="adminLink" style="display:none; color:#00f7ff;">📊 Admin Panel</a>
+        <button id="logoutBtn">Logout</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="profile-header">
+        <img id="displayAvatar" class="profile-pic" src="https://via.placeholder.com/150" alt="Profile Avatar">
+        <h2 id="welcomeName" style="margin: 10px 0 5px 0;">Loading Profile...</h2>
+        <div id="accountStatus" class="status-badge status-pending">Pending Verification</div>
+    </div>
+
+    <div class="input-box">
+        <label>Full Name</label>
+        <input type="text" id="memberName">
+    </div>
+
+    <div class="input-box">
+        <label>Phone Number</label>
+        <input type="text" id="memberPhone">
+    </div>
+
+    <div class="input-box">
+        <label>Village / District</label>
+        <input type="text" id="memberVillage">
+    </div>
+
+    <div class="file-box">
+        <label style="color: #cbd5e1; font-size: 0.85rem;">Update Profile Photo</label><br><br>
+        <input type="file" id="updatePhoto" accept="image/*">
+        <input type="hidden" id="updatePhotoBase64" value="">
+    </div>
+
+    <button class="btn-save" id="saveProfileBtn">
+        Save Profile Changes
+    </button>
+
+    <div id="loadingOverlay">
+        ⏳ Saving changes to database...
+    </div>
+</div>
+
+<script type="module" src="js/members.js"></script>
+</body>
+</html>
 
