@@ -29,7 +29,7 @@ window.loginUserSession = async function () {
             window.location.href = "admin-dashboard.html";
         } else {
             alert("✅ Login Successful! Opening your profile portal...");
-            window.location.href = "members.html";
+            window.location.href = "church-members.html";
         }
 
     } catch (error) {
