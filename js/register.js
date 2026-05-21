@@ -43,7 +43,7 @@ window.registerUser = async function () {
     });
 
     alert("✅ Registration Successful!");
-    window.location.href = "admin-dashboard.html";
+    window.location.href = "index.html";
 
   } catch (error) {
     console.error(error);
