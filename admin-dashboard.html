@@ -1,16 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Admin Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Admin Dashboard | SDA Church</title>
+
+<link rel="stylesheet"
+href="css/style.css">
+
 </head>
 
-<body style="background:#0f172a;color:white;font-family:Arial;">
+<body>
 
-<h2>👨‍💼 Church Admin Dashboard</h2>
+<!-- NAVBAR -->
+<div class="navbar">
 
-<div id="membersList"></div>
+    <div class="logo">
+        ⛪ SDA Admin
+    </div>
 
-<script type="module" src="js/dashboard.js"></script>
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="church-members.html">Members</a>
+        <a href="#" onclick="logoutAdmin()">Logout</a>
+    </div>
+
+</div>
+
+<!-- CONTAINER -->
+<div class="container">
+
+    <h2>
+        👨‍💼 Church Admin Dashboard
+    </h2>
+
+    <!-- STATS -->
+    <div id="stats"
+    style="
+    display:grid;
+    grid-template-columns:
+    repeat(auto-fit,minmax(150px,1fr));
+    gap:15px;
+    margin-bottom:25px;
+    ">
+
+        <div class="card">
+            <h3 id="totalMembers">0</h3>
+            <p>Total Members</p>
+        </div>
+
+        <div class="card">
+            <h3 id="pendingMembers">0</h3>
+            <p>Pending</p>
+        </div>
+
+        <div class="card">
+            <h3 id="approvedMembers">0</h3>
+            <p>Approved</p>
+        </div>
+
+    </div>
+
+    <!-- SEARCH -->
+    <div class="input-box">
+        <input
+        type="text"
+        id="searchInput"
+        placeholder="Search member by name..."
+        onkeyup="filterMembers()">
+    </div>
+
+    <!-- MEMBERS -->
+    <div id="membersList"></div>
+
+</div>
+
+<script type="module"
+src="js/dashboard.js"></script>
+
 </body>
 </html>
