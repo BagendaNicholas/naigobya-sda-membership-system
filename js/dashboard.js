@@ -13,10 +13,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
 
-// ONLY ADMIN EMAIL
+// ADMIN EMAIL
 const ADMIN_EMAIL = "nicholasbagenda@gmail.com";
 
-let allMembers = []; // store for search + editing
+let membersCache = [];
 
 
 // AUTH CHECK
@@ -44,150 +44,105 @@ window.logoutAdmin = async function () {
 };
 
 
-// LOAD MEMBERS
+// LOAD MEMBERS FROM FIRESTORE
 async function loadMembers() {
 
   const membersList = document.getElementById("membersList");
   membersList.innerHTML = "";
 
-  allMembers = [];
+  membersCache = [];
 
   let total = 0;
   let pending = 0;
   let approved = 0;
 
-  const querySnapshot = await getDocs(collection(db, "members"));
+  const snapshot = await getDocs(collection(db, "members"));
 
-  querySnapshot.forEach((member) => {
+  snapshot.forEach((docSnap) => {
 
-    const data = member.data();
-    const id = member.id;
+    const data = docSnap.data();
+    const id = docSnap.id;
 
-    allMembers.push({ id, ...data });
+    membersCache.push({ id, ...data });
 
     total++;
 
     if (data.status === "pending") pending++;
     if (data.status === "approved") approved++;
 
-    const div = document.createElement("div");
-    div.classList.add("card");
+    const card = document.createElement("div");
+    card.className = "card";
 
-    div.innerHTML = `
-      <div style="text-align:center;">
+    card.innerHTML = `
+      <div style="text-align:center">
 
         <img src="${data.photoURL || 'https://via.placeholder.com/80'}"
-        class="member-photo"
         style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
 
-        <input type="text" id="name-${id}" value="${data.name || ''}" style="margin-top:5px;width:90%;">
+        <h3>${data.name || "No Name"}</h3>
+        <p>${data.email || "No Email"}</p>
+        <p>${data.phone || "No Phone"}</p>
+        <p>${data.address || ""}</p>
 
-        <input type="text" id="email-${id}" value="${data.email || ''}" style="margin-top:5px;width:90%;">
+        <p>Status: <b>${data.status || "pending"}</b></p>
 
-        <input type="text" id="phone-${id}" value="${data.phone || ''}" style="margin-top:5px;width:90%;">
-
-        <p>Status:
-          <b>${data.status}</b>
-        </p>
-
-        <!-- UPDATE BUTTON -->
-        <button onclick="updateMember('${id}')"
-        style="margin-top:10px;background:#2563eb;color:white;padding:6px;border:none;">
-          💾 Save Changes
+        <button onclick="approveMember('${id}')"
+        style="background:#16a34a;color:white;margin-top:8px;">
+          ✅ Approve
         </button>
 
-        <!-- APPROVE / REJECT -->
-        <div style="margin-top:10px;">
-
-          <button onclick="approveMember('${id}')">
-            ✅ Approve
-          </button>
-
-          <button onclick="rejectMember('${id}')"
-          style="background:red;">
-            ❌ Reject
-          </button>
-
-        </div>
+        <button onclick="rejectMember('${id}')"
+        style="background:red;color:white;margin-top:8px;">
+          ❌ Reject
+        </button>
 
       </div>
     `;
 
-    membersList.appendChild(div);
-
+    membersList.appendChild(card);
   });
 
-  // STATS UPDATE
+  // UPDATE STATS
   document.getElementById("totalMembers").innerText = total;
   document.getElementById("pendingMembers").innerText = pending;
   document.getElementById("approvedMembers").innerText = approved;
 }
 
 
-// ✏️ UPDATE MEMBER INFO (NEW FEATURE)
-window.updateMember = async function (id) {
-
-  const newName = document.getElementById(`name-${id}`).value;
-  const newEmail = document.getElementById(`email-${id}`).value;
-  const newPhone = document.getElementById(`phone-${id}`).value;
-
-  if (!newName || !newEmail) {
-    alert("Name and Email are required!");
-    return;
-  }
-
-  await updateDoc(doc(db, "members", id), {
-    name: newName,
-    email: newEmail,
-    phone: newPhone
-  });
-
-  alert("✅ Member updated successfully!");
-
-  loadMembers();
-};
-
-
-// APPROVE
+// APPROVE MEMBER
 window.approveMember = async function (id) {
 
   await updateDoc(doc(db, "members", id), {
     status: "approved"
   });
 
-  alert("✅ Member Approved");
   loadMembers();
 };
 
 
-// REJECT
+// REJECT MEMBER
 window.rejectMember = async function (id) {
 
   await updateDoc(doc(db, "members", id), {
     status: "rejected"
   });
 
-  alert("❌ Member Rejected");
   loadMembers();
 };
 
 
-// SEARCH
+// SEARCH MEMBERS
 window.filterMembers = function () {
 
-  const input = document.getElementById("searchInput").value.toLowerCase();
+  const value = document.getElementById("searchInput").value.toLowerCase();
 
-  allMembers.forEach((member) => {
+  const cards = document.querySelectorAll(".card");
 
-    const cardInputs = document.getElementById(`name-${member.id}`);
-    const card = cardInputs?.parentElement;
+  cards.forEach((card) => {
 
-    if (!card) return;
+    const text = card.innerText.toLowerCase();
 
-    const text =
-      (member.name + member.email + member.phone).toLowerCase();
-
-    if (text.includes(input)) {
+    if (text.includes(value)) {
       card.style.display = "block";
     } else {
       card.style.display = "none";
