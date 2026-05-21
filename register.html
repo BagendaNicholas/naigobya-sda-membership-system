@@ -1,214 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+// js/register.js
+import { auth, db, storage } from "./firebase.js";
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+import { ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
 
-<title>Register Member | SDA Church</title>
+// EXPOSED GLOBAL REGISTER CONTROLLER
+window.registerUser = async function () {
+  // Capture DOM data metrics safely
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const village = document.getElementById("village").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const photo = document.getElementById("photo").files[0];
+  const loading = document.getElementById("loading");
 
-<link rel="stylesheet" href="css/style.css">
+  // 1. DATA INPUT EMPTY VALIDATIONS
+  if (!name || !phone || !village || !email || !password) {
+    alert("⚠️ Please complete all required form fields.");
+    return;
+  }
 
-<style>
+  // 2. SECURITY POLICY BOUNDS LENGTH CHECK
+  if (password.length < 6) {
+    alert("⚠️ Authentication security requires passwords to be at least 6 characters.");
+    return;
+  }
 
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#0f172a;
-    color:white;
-}
+  // 3. FILE METRIC POINTER CHECK
+  if (!photo) {
+    alert("⚠️ Please capture or upload an introductory profile photo.");
+    return;
+  }
 
-/* NAVBAR */
-.navbar{
-    background:#111827;
-    padding:15px 8%;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
+  // 4. STORAGE FILE BINARY COMPRESSION LIMIT WATCH (2MB)
+  if (photo.size > 2 * 1024 * 1024) {
+    alert("⚠️ Upload limit exceeded. Profile image files must remain below 2MB.");
+    return;
+  }
 
-.logo{
-    font-size:20px;
-    font-weight:bold;
-    color:#22c55e;
-}
+  try {
+    // Activate loading UI display indicator state
+    loading.style.display = "block";
 
-/* FORM CONTAINER */
-.container{
-    max-width:500px;
-    margin:40px auto;
-    background:#1e293b;
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 0 15px rgba(0,0,0,0.4);
-}
+    // 5. INITIATE USER PROVISIONING
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCred.user;
 
-.container h2{
-    text-align:center;
-    margin-bottom:25px;
-}
+    // 6. MAP COMPONENT TARGET TO STORAGE STORAGE BUCKETS
+    const imageRef = sRef(storage, `members/${user.uid}`);
 
-/* INPUTS */
-.input-box{
-    margin-bottom:15px;
-}
+    // Push raw file bytes up to cloud storage
+    await uploadBytes(imageRef, photo);
 
-.input-box input{
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:8px;
-    background:#0f172a;
-    color:white;
-    outline:none;
-}
+    // Retrieve live publicly signed web asset connection path
+    const photoURL = await getDownloadURL(imageRef);
 
-/* FILE */
-.file-box{
-    margin:15px 0;
-}
+    // 7. WRITE CORE RECORD SETS DOWN INTO CLOUD FIRESTORE
+    // "address" parameter explicitly maps to your dashboard tracking card logic
+    await setDoc(doc(db, "members", user.uid), {
+      uid: user.uid,
+      name: name,
+      phone: phone,
+      address: village, // Saved matching your admin dashboard's profile requirements
+      email: email,
+      photoURL: photoURL,
+      status: "pending",
+      role: "member",
+      createdAt: new Date().toISOString()
+    });
 
-.file-box input{
-    color:white;
-}
+    alert("✅ Member Registration Completed Successfully!");
 
-/* IMAGE PREVIEW */
-.preview{
-    text-align:center;
-    margin-top:15px;
-}
+    // 8. FORWARD USER ALONG ROUTING PIPELINE DIRECTLY TO THE ADMIN INTERFACE
+    window.location.href = "admin-dashboard.html";
 
-.preview img{
-    width:120px;
-    height:120px;
-    border-radius:50%;
-    object-fit:cover;
-    border:3px solid #22c55e;
-    display:none;
-}
-
-/* BUTTON */
-button{
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:10px;
-    background:#22c55e;
-    color:white;
-    font-size:16px;
-    cursor:pointer;
-    transition:0.3s;
-}
-
-button:hover{
-    opacity:0.9;
-}
-
-/* LOADING */
-#loading{
-    display:none;
-    text-align:center;
-    margin-top:15px;
-    color:#22c55e;
-}
-
-/* MOBILE */
-@media(max-width:768px){
-
-    .container{
-        margin:20px;
-        padding:20px;
-    }
-
-}
-
-</style>
-</head>
-
-<body>
-
-<!-- NAVBAR -->
-<div class="navbar">
-    <div class="logo">⛪ Naigobya SDA</div>
-</div>
-
-<!-- FORM -->
-<div class="container">
-
-    <h2>Church Member Registration</h2>
-
-    <div class="input-box">
-        <input type="text" id="name" placeholder="Full Name">
-    </div>
-
-    <div class="input-box">
-        <input type="text" id="phone" placeholder="Phone Number">
-    </div>
-
-    <div class="input-box">
-        <input type="text" id="village" placeholder="Village / District">
-    </div>
-
-    <div class="input-box">
-        <input type="email" id="email" placeholder="Email Address">
-    </div>
-
-    <div class="input-box">
-        <input type="password" id="password" placeholder="Password">
-    </div>
-
-    <!-- PHOTO -->
-    <div class="file-box">
-        <label>Select Profile Photo</label><br><br>
-        <input type="file" id="photo" accept="image/*">
-    </div>
-
-    <!-- PREVIEW -->
-    <div class="preview">
-        <img id="previewImage">
-    </div>
-
-    <!-- BUTTON -->
-    <button onclick="registerUser()">
-        Register Member
-    </button>
-
-    <!-- LOADING -->
-    <div id="loading">
-        Uploading and Registering...
-    </div>
-
-</div>
-
-<script>
-
-// IMAGE PREVIEW
-const photoInput = document.getElementById("photo");
-const previewImage = document.getElementById("previewImage");
-
-photoInput.addEventListener("change", function(){
-
-    const file = this.files[0];
-
-    if(file){
-
-        const reader = new FileReader();
-
-        reader.onload = function(e){
-
-            previewImage.src = e.target.result;
-            previewImage.style.display = "block";
-
-        }
-
-        reader.readAsDataURL(file);
-
-    }
-
-});
-
-</script>
-
-<script type="module" src="js/register.js"></script>
-
-</body>
-</html>
+  } catch (error) {
+    console.error("Critical failure during core registration process flow:", error);
+    alert(`Registration Error: ${error.message}`);
+  } finally {
+    // Safely remove loading visual items from screen flow
+    loading.style.display = "none";
+  }
+};
