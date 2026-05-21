@@ -71,8 +71,7 @@ function streamLiveChurchMembers() {
                 memberCardElement.className = "member-profile-card";
                 memberCardElement.style.cssText = "background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: center; margin-top: 15px;";
 
-                // FIXED: Changed image src fallback to a high-availability profile initials generator
-                // Added an inline onerror fallback string pointing to a static user icon as an absolute backup layer
+                // UPDATED: Added a clean blue "Edit Member Details" routing button right above the Approve/Reject controls
                 memberCardElement.innerHTML = `
                     <img src="${profileData.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(memberName)}`}" 
                          style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom: 12px; border: 2px solid #16a34a;"
@@ -82,7 +81,11 @@ function streamLiveChurchMembers() {
                     <p style="margin: 4px 0; font-size: 0.9rem; color: #ccc;">${profileData.phone || "No Phone"}</p>
                     <p style="margin: 12px 0; font-size: 0.95rem;">Status: <b style="text-transform: uppercase; color: ${profileData.status === 'approved' ? '#16a34a' : '#ffaa00'}">${profileData.status || "pending"}</b></p>
                     
-                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                    <div style="margin-bottom: 12px;">
+                        <button onclick="window.location.href='church-members.html?uid=${uniqueProfileId}'" style="background:#0284c7; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-weight:600; width:85%;">✏️ Edit Member Details</button>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; justify-content: center;">
                         <button onclick="approveMember('${uniqueProfileId}')" style="background:#16a34a; color:white; border:none; padding:8px 14px; border-radius:4px; cursor:pointer; font-weight:600;">✅ Approve</button>
                         <button onclick="rejectMember('${uniqueProfileId}')" style="background:#dc2626; color:white; border:none; padding:8px 14px; border-radius:4px; cursor:pointer; font-weight:600;">❌ Reject</button>
                     </div>
