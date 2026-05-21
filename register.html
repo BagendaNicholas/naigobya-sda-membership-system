@@ -2,33 +2,211 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Register Member</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Register Member | SDA Church</title>
+
 <link rel="stylesheet" href="css/style.css">
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#0f172a;
+    color:white;
+}
+
+/* NAVBAR */
+.navbar{
+    background:#111827;
+    padding:15px 8%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-size:20px;
+    font-weight:bold;
+    color:#22c55e;
+}
+
+/* FORM CONTAINER */
+.container{
+    max-width:500px;
+    margin:40px auto;
+    background:#1e293b;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 0 15px rgba(0,0,0,0.4);
+}
+
+.container h2{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+/* INPUTS */
+.input-box{
+    margin-bottom:15px;
+}
+
+.input-box input{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:#0f172a;
+    color:white;
+    outline:none;
+}
+
+/* FILE */
+.file-box{
+    margin:15px 0;
+}
+
+.file-box input{
+    color:white;
+}
+
+/* IMAGE PREVIEW */
+.preview{
+    text-align:center;
+    margin-top:15px;
+}
+
+.preview img{
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #22c55e;
+    display:none;
+}
+
+/* BUTTON */
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:#22c55e;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+/* LOADING */
+#loading{
+    display:none;
+    text-align:center;
+    margin-top:15px;
+    color:#22c55e;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+    .container{
+        margin:20px;
+        padding:20px;
+    }
+
+}
+
+</style>
 </head>
 
-<body style="background:#0f172a; color:white; font-family:Arial;">
+<body>
 
-<h2 style="text-align:center;">⛪ Church Member Registration</h2>
+<!-- NAVBAR -->
+<div class="navbar">
+    <div class="logo">⛪ Naigobya SDA</div>
+</div>
 
-<div style="max-width:500px;margin:auto;padding:20px;">
+<!-- FORM -->
+<div class="container">
 
-  <input type="text" id="name" placeholder="Full Name" style="width:100%;padding:10px;margin:5px;"><br>
+    <h2>Church Member Registration</h2>
 
-  <input type="text" id="phone" placeholder="Phone Number" style="width:100%;padding:10px;margin:5px;"><br>
+    <div class="input-box">
+        <input type="text" id="name" placeholder="Full Name">
+    </div>
 
-  <input type="text" id="village" placeholder="Village / District" style="width:100%;padding:10px;margin:5px;"><br>
+    <div class="input-box">
+        <input type="text" id="phone" placeholder="Phone Number">
+    </div>
 
-  <input type="email" id="email" placeholder="Email" style="width:100%;padding:10px;margin:5px;"><br>
+    <div class="input-box">
+        <input type="text" id="village" placeholder="Village / District">
+    </div>
 
-  <input type="password" id="password" placeholder="Password" style="width:100%;padding:10px;margin:5px;"><br>
+    <div class="input-box">
+        <input type="email" id="email" placeholder="Email Address">
+    </div>
 
-  <input type="file" id="photo"><br><br>
+    <div class="input-box">
+        <input type="password" id="password" placeholder="Password">
+    </div>
 
-  <button onclick="registerUser()" style="width:100%;padding:12px;background:#22c55e;color:white;border:none;">
-    Register
-  </button>
+    <!-- PHOTO -->
+    <div class="file-box">
+        <label>Select Profile Photo</label><br><br>
+        <input type="file" id="photo" accept="image/*">
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="preview">
+        <img id="previewImage">
+    </div>
+
+    <!-- BUTTON -->
+    <button onclick="registerUser()">
+        Register Member
+    </button>
+
+    <!-- LOADING -->
+    <div id="loading">
+        Uploading and Registering...
+    </div>
 
 </div>
+
+<script>
+
+// IMAGE PREVIEW
+const photoInput = document.getElementById("photo");
+const previewImage = document.getElementById("previewImage");
+
+photoInput.addEventListener("change", function(){
+
+    const file = this.files[0];
+
+    if(file){
+
+        const reader = new FileReader();
+
+        reader.onload = function(e){
+
+            previewImage.src = e.target.result;
+            previewImage.style.display = "block";
+
+        }
+
+        reader.readAsDataURL(file);
+
+    }
+
+});
+
+</script>
 
 <script type="module" src="js/register.js"></script>
 
