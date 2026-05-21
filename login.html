@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Login | SDA Church</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+}
+.navbar {
+    background: #111827;
+    padding: 15px 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #22c55e;
+}
+.container {
+    max-width: 450px;
+    margin: 60px auto;
+    background: #1e293b;
+    padding: 35px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+}
+.container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+.input-box {
+    margin-bottom: 20px;
+}
+.input-box label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #cbd5e1;
+}
+.input-box input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #0f172a;
+    color: white;
+    outline: none;
+    box-sizing: border-box;
+}
+.input-box input:focus {
+    box-shadow: 0 0 0 2px #22c55e;
+}
+button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #22c55e;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+button:hover {
+    opacity: 0.9;
+}
+.footer-text {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #94a3b8;
+}
+.footer-text a {
+    color: #22c55e;
+    text-decoration: none;
+    font-weight: bold;
+}
+.footer-text a:hover {
+    text-decoration: underline;
+}
+#loadingMessage {
+    display: none;
+    text-align: center;
+    margin-top: 15px;
+    color: #22c55e;
+    font-weight: bold;
+}
+@media(max-width:768px) {
+    .container {
+        margin: 30px 20px;
+        padding: 25px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo">⛪ Naigobya SDA</div>
+</div>
+
+<div class="container">
+    <h2>🔑 Member Sign In</h2>
+
+    <div class="input-box">
+        <label>Email Address</label>
+        <input type="email" id="loginEmail" placeholder="Enter your email address" required>
+    </div>
+
+    <div class="input-box">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter your account password" required>
+    </div>
+
+    <button onclick="loginUserSession()">
+        Sign In to Portal
+    </button>
+
+    <div id="loadingMessage">
+        ⏳ Verifying credentials...
+    </div>
+
+    <div class="footer-text">
+        New member? <a href="register.html">Register here</a>
+    </div>
+</div>
+
+<script type="module" src="js/login.js"></script>
+</body>
+</html>
