@@ -14,199 +14,183 @@ import {
 
 
 // ONLY ADMIN EMAIL
-const ADMIN_EMAIL =
-"nicholasbagenda@gmail.com";
+const ADMIN_EMAIL = "nicholasbagenda@gmail.com";
+
+let allMembers = []; // store for search + editing
 
 
-// CHECK AUTH
-onAuthStateChanged(auth, async(user)=>{
+// AUTH CHECK
+onAuthStateChanged(auth, async (user) => {
 
-    if(!user){
+  if (!user) {
+    window.location.href = "admin-login.html";
+    return;
+  }
 
-        window.location.href =
-        "admin-login.html";
+  if (user.email !== ADMIN_EMAIL) {
+    alert("❌ Access Denied");
+    window.location.href = "index.html";
+    return;
+  }
 
-        return;
-
-    }
-
-    if(user.email !== ADMIN_EMAIL){
-
-        alert("❌ Access Denied");
-
-        window.location.href =
-        "index.html";
-
-        return;
-
-    }
-
-    loadMembers();
-
+  loadMembers();
 });
 
 
 // LOGOUT
-window.logoutAdmin = async function(){
-
-    await signOut(auth);
-
-    window.location.href =
-    "index.html";
-
+window.logoutAdmin = async function () {
+  await signOut(auth);
+  window.location.href = "index.html";
 };
 
 
 // LOAD MEMBERS
-async function loadMembers(){
+async function loadMembers() {
 
-    const membersList =
-    document.getElementById("membersList");
+  const membersList = document.getElementById("membersList");
+  membersList.innerHTML = "";
 
-    membersList.innerHTML = "";
+  allMembers = [];
 
-    let total = 0;
-    let pending = 0;
-    let approved = 0;
+  let total = 0;
+  let pending = 0;
+  let approved = 0;
 
-    const querySnapshot =
-    await getDocs(collection(db, "members"));
+  const querySnapshot = await getDocs(collection(db, "members"));
 
-    querySnapshot.forEach((member)=>{
+  querySnapshot.forEach((member) => {
 
-        total++;
+    const data = member.data();
+    const id = member.id;
 
-        const data = member.data();
+    allMembers.push({ id, ...data });
 
-        if(data.status === "pending"){
-            pending++;
-        }
+    total++;
 
-        if(data.status === "approved"){
-            approved++;
-        }
+    if (data.status === "pending") pending++;
+    if (data.status === "approved") approved++;
 
-        const div =
-        document.createElement("div");
+    const div = document.createElement("div");
+    div.classList.add("card");
 
-        div.classList.add("card");
+    div.innerHTML = `
+      <div style="text-align:center;">
 
-        div.innerHTML = `
+        <img src="${data.photoURL || 'https://via.placeholder.com/80'}"
+        class="member-photo"
+        style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
 
-            <div style="text-align:center;">
+        <input type="text" id="name-${id}" value="${data.name || ''}" style="margin-top:5px;width:90%;">
 
-                <img
-                src="${data.photoURL}"
-                class="member-photo">
+        <input type="text" id="email-${id}" value="${data.email || ''}" style="margin-top:5px;width:90%;">
 
-                <h3>${data.name}</h3>
+        <input type="text" id="phone-${id}" value="${data.phone || ''}" style="margin-top:5px;width:90%;">
 
-                <p>${data.email}</p>
+        <p>Status:
+          <b>${data.status}</b>
+        </p>
 
-                <p>${data.phone}</p>
+        <!-- UPDATE BUTTON -->
+        <button onclick="updateMember('${id}')"
+        style="margin-top:10px;background:#2563eb;color:white;padding:6px;border:none;">
+          💾 Save Changes
+        </button>
 
-                <p>Status:
-                <b>${data.status}</b></p>
+        <!-- APPROVE / REJECT -->
+        <div style="margin-top:10px;">
 
-                <button
-                onclick="approveMember('${member.id}')"
-                style="margin-top:10px;">
-                ✅ Approve
-                </button>
+          <button onclick="approveMember('${id}')">
+            ✅ Approve
+          </button>
 
-                <button
-                onclick="rejectMember('${member.id}')"
-                style="
-                margin-top:10px;
-                background:red;">
-                ❌ Reject
-                </button>
+          <button onclick="rejectMember('${id}')"
+          style="background:red;">
+            ❌ Reject
+          </button>
 
-            </div>
+        </div>
 
-        `;
+      </div>
+    `;
 
-        membersList.appendChild(div);
+    membersList.appendChild(div);
 
-    });
+  });
 
-    // UPDATE STATS
-    document.getElementById(
-    "totalMembers").innerText = total;
-
-    document.getElementById(
-    "pendingMembers").innerText = pending;
-
-    document.getElementById(
-    "approvedMembers").innerText = approved;
-
+  // STATS UPDATE
+  document.getElementById("totalMembers").innerText = total;
+  document.getElementById("pendingMembers").innerText = pending;
+  document.getElementById("approvedMembers").innerText = approved;
 }
 
 
+// ✏️ UPDATE MEMBER INFO (NEW FEATURE)
+window.updateMember = async function (id) {
+
+  const newName = document.getElementById(`name-${id}`).value;
+  const newEmail = document.getElementById(`email-${id}`).value;
+  const newPhone = document.getElementById(`phone-${id}`).value;
+
+  if (!newName || !newEmail) {
+    alert("Name and Email are required!");
+    return;
+  }
+
+  await updateDoc(doc(db, "members", id), {
+    name: newName,
+    email: newEmail,
+    phone: newPhone
+  });
+
+  alert("✅ Member updated successfully!");
+
+  loadMembers();
+};
+
+
 // APPROVE
-window.approveMember =
-async function(id){
+window.approveMember = async function (id) {
 
-    await updateDoc(
-        doc(db,"members",id),
-        {
-            status:"approved"
-        }
-    );
+  await updateDoc(doc(db, "members", id), {
+    status: "approved"
+  });
 
-    alert("✅ Member Approved");
-
-    location.reload();
-
+  alert("✅ Member Approved");
+  loadMembers();
 };
 
 
 // REJECT
-window.rejectMember =
-async function(id){
+window.rejectMember = async function (id) {
 
-    await updateDoc(
-        doc(db,"members",id),
-        {
-            status:"rejected"
-        }
-    );
+  await updateDoc(doc(db, "members", id), {
+    status: "rejected"
+  });
 
-    alert("❌ Member Rejected");
-
-    location.reload();
-
+  alert("❌ Member Rejected");
+  loadMembers();
 };
 
 
 // SEARCH
-window.filterMembers =
-function(){
+window.filterMembers = function () {
 
-    const input =
-    document.getElementById(
-    "searchInput").value.toLowerCase();
+  const input = document.getElementById("searchInput").value.toLowerCase();
 
-    const cards =
-    document.querySelectorAll(".card");
+  allMembers.forEach((member) => {
 
-    cards.forEach((card)=>{
+    const cardInputs = document.getElementById(`name-${member.id}`);
+    const card = cardInputs?.parentElement;
 
-        const text =
-        card.innerText.toLowerCase();
+    if (!card) return;
 
-        if(text.includes(input)){
+    const text =
+      (member.name + member.email + member.phone).toLowerCase();
 
-            card.style.display =
-            "block";
-
-        }else{
-
-            card.style.display =
-            "none";
-
-        }
-
-    });
-
+    if (text.includes(input)) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+  });
 };
