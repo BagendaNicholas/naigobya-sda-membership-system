@@ -6,7 +6,6 @@ import { collection, onSnapshot, updateDoc, doc } from "https://www.gstatic.com/
 const LOGGED_ADMIN_EMAIL = "nicholasbagenda@gmail.com";
 let deactivateSnapshotStream = null;
 
-// Target the stats grid to inject an error display dynamically if things fail
 function displayUIMessage(message, isError = false) {
     let msgBox = document.getElementById("dbErrorMessage");
     if (!msgBox) {
@@ -14,15 +13,14 @@ function displayUIMessage(message, isError = false) {
         msgBox.id = "dbErrorMessage";
         document.querySelector(".container").insertBefore(msgBox, document.getElementById("stats"));
     }
-    msgBox.style.cssText = `color: ${isError ? '#ff4444' : '#00ff88'}; font-weight: bold; text-align: center; margin: 15px 0;`;
+    msgBox.style.cssText = `color: ${isError ? '#ff4444' : '#00ff88'}; font-weight: bold; text-align: center; margin: 15px 0; font-size: 0.95rem;`;
     msgBox.innerText = message;
 }
 
-// 1. AUTHENTICATION PROTECTION
+// 1. AUTH WATCHER
 onAuthStateChanged(auth, (activeUser) => {
     if (!activeUser) {
         if (deactivateSnapshotStream) deactivateSnapshotStream();
-        displayUIMessage("Redirecting to login...", false);
         window.location.href = "admin-login.html";
         return;
     }
@@ -33,19 +31,24 @@ onAuthStateChanged(auth, (activeUser) => {
         return;
     }
 
-    displayUIMessage("Authenticated! Loading church records...", false);
+    displayUIMessage("🔄 Syncing with Firebase Root Path...", false);
     streamLiveChurchMembers();
 });
 
-// 2. REAL-TIME DATA FETCH
+// 2. DATA SNAPSHOT STREAM
 function streamLiveChurchMembers() {
     const listDisplayContainer = document.getElementById("membersList");
     if (!listDisplayContainer) return;
 
+    // Safety fallback step: check if db object successfully loaded from firebase.js
+    if (!db) {
+        displayUIMessage("⚠️ Connection Error: The database object 'db' was not loaded from firebase.js. Check your import path scripts.", true);
+        return;
+    }
+
     try {
         deactivateSnapshotStream = onSnapshot(collection(db, "members"), (liveSnapshot) => {
-            // If it connects successfully, clear any old error messages
-            displayUIMessage("", false);
+            displayUIMessage("", false); // Clear message boxes on success
             listDisplayContainer.innerHTML = "";
             
             let counterTotal = 0;
@@ -53,7 +56,7 @@ function streamLiveChurchMembers() {
             let counterApproved = 0;
 
             if (liveSnapshot.empty) {
-                displayUIMessage("Connected to Firebase, but no member documents found.", true);
+                displayUIMessage("Connected, but the root 'members' collection contains 0 documents.", true);
             }
 
             liveSnapshot.forEach((documentObject) => {
@@ -70,8 +73,8 @@ function streamLiveChurchMembers() {
 
                 memberCardElement.innerHTML = `
                     <img src="${profileData.photoURL || 'https://via.placeholder.com/80'}" 
-                         style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom: 12px; border: 2px solid #00f7ff;">
-                    <h3 style="margin: 5px 0; color: #fff;">${profileData.name || "Anonymous"}</h3>
+                         style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom: 12px; border: 2px solid #16a34a;">
+                    <h3 style="margin: 5px 0; color: #fff;">${profileData.name || "Anonymous Member"}</h3>
                     <p style="margin: 4px 0; font-size: 0.9rem; color: #ccc;">${profileData.email || "No Email"}</p>
                     <p style="margin: 4px 0; font-size: 0.9rem; color: #ccc;">${profileData.phone || "No Phone"}</p>
                     <p style="margin: 12px 0; font-size: 0.95rem;">Status: <b style="text-transform: uppercase; color: ${profileData.status === 'approved' ? '#16a34a' : '#ffaa00'}">${profileData.status || "pending"}</b></p>
@@ -90,16 +93,14 @@ function streamLiveChurchMembers() {
 
             window.filterMembers();
         }, (streamFetchError) => {
-            // This catches Permission Denied, Bad Config, or Network Blocks!
-            console.error("Firebase Sync Error:", streamFetchError);
-            displayUIMessage(`⚠️ Firebase Error: ${streamFetchError.message}`, true);
+            displayUIMessage(`⚠️ Firebase Stream Error: ${streamFetchError.message}`, true);
         });
     } catch (err) {
-        displayUIMessage(`⚠️ Script Error: ${err.message}`, true);
+        displayUIMessage(`⚠️ Runtime Exception: ${err.message}`, true);
     }
 }
 
-// 3. ACTION HANDLERS
+// 3. ACTION LOGIC
 window.approveMember = async function (targetDocumentId) {
     try {
         await updateDoc(doc(db, "members", targetDocumentId), { status: "approved" });
