@@ -1,19 +1,11 @@
 // js/register.js
-
 import { auth, db } from "./firebase.js";
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-import {
-  createUserWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-
-import {
-  doc,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
-
-
-// REGISTER FUNCTION
-window.registerUser = async function () {
+// Listen for form submission instead of relying on an inline onclick attribute
+document.getElementById("registrationForm").addEventListener("submit", async function (e) {
+  e.preventDefault(); // Prevents page from reloading prematurely
 
   // GET INPUT VALUES
   const fullName = document.getElementById("fullName").value.trim();
@@ -30,8 +22,7 @@ window.registerUser = async function () {
   const photoString = document.getElementById("photoBase64String").value;
   const loading = document.getElementById("loading");
 
-
-  // VALIDATION
+  // MANUAL VALIDATION FALLBACK
   if (!fullName || !dob || !gender || !phone || !email || !password || !village) {
     alert("⚠️ Please fill all required fields.");
     return;
@@ -42,21 +33,16 @@ window.registerUser = async function () {
     return;
   }
 
-
   try {
-
     // SHOW LOADING
     if (loading) loading.style.display = "block";
 
-
-    // CREATE AUTH USER (MEMBER CHOOSES PASSWORD)
+    // CREATE AUTH USER
     const userCred = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCred.user;
 
-
     // SAVE MEMBER DATA
     await setDoc(doc(db, "members", user.uid), {
-
       uid: user.uid,
       fullName,
       dateOfBirth: dob,
@@ -69,25 +55,20 @@ window.registerUser = async function () {
       churchRole,
       dateJoined,
       photoURL: photoString || "",
-
       church: "Naigobya SDA Church",
       role: "member",
       status: "pending",
       createdAt: new Date().toISOString()
-
     });
-
 
     alert("✅ Registration Successful!");
     window.location.href = "index.html";
 
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Registration Error:", error);
     alert(error.message);
-  }
-  finally {
+  } finally {
+    // HIDE LOADING
     if (loading) loading.style.display = "none";
   }
-
-};
+});
