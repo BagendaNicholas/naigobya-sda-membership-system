@@ -103,9 +103,9 @@ photoInput.addEventListener("change", function () {
 
     if (!file) return;
 
-    if (file.size > 1024 * 1024) {
+    if (file.size > 3000 * 3000) {
 
-        alert("⚠️ Please choose image below 1MB.");
+        alert("⚠️ Please choose image below 3MB.");
 
         this.value = "";
         previewImage.style.display = "none";
