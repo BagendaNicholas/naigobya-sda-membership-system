@@ -57,24 +57,9 @@ To have also
 
 <div class="input-box">  
         <input type="text" id="name" placeholder="Full Name">  
-    </div>  <div class="input-box">  
-    <input type="text" id="dob" placeholder="Date Of Birth">  
-</div>  
-
-<div class="input-box">  
-    <input type="text" id="country" placeholder="Country">  
-</div>  
-
+   
 <div class="input-box">  
     <input type="text" id="phone" placeholder="Phone Number">  
-</div>  
-
-<div class="input-box">  
-    <input type="text" id="pastor" placeholder="Pastor/Omusumba">  
-</div>  
-
-<div class="input-box">  
-    <input type="text" id="date" placeholder="Baptism Date">  
 </div>  
 
 <div class="input-box">  
