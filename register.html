@@ -34,6 +34,58 @@ href="css/style.css">
 
     <!-- INPUTS HERE -->
 
+    <div class="input-box">
+        <input type="text" id="fullName" placeholder="Full Name" required>
+    </div>
+
+    <div class="input-box">
+        <input type="date" id="dob" required>
+    </div>
+
+    <div class="input-box">
+        <select id="gender" required>
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+    </div>
+
+    <div class="input-box">
+        <input type="tel" id="phone" placeholder="Phone Number" required>
+    </div>
+
+    <div class="input-box">
+        <input type="email" id="email" placeholder="Email Address">
+    </div>
+
+    <div class="input-box">
+        <input type="text" id="address" placeholder="Home Address">
+    </div>
+
+    <div class="input-box">
+        <input type="text" id="village" placeholder="Village / District">
+    </div>
+
+    <div class="input-box">
+        <input type="text" id="baptismStatus" placeholder="Baptism Status (Baptized / Not Baptized)">
+    </div>
+
+    <div class="input-box">
+        <input type="text" id="churchRole" placeholder="Church Role (Member, Deacon, Choir etc)">
+    </div>
+
+    <div class="input-box">
+        <input type="date" id="dateJoined" placeholder="Date Joined Church">
+    </div>
+
+    <div class="input-box">
+        <input type="file" id="photo" accept="image/*">
+    </div>
+
+    <img id="previewImage" style="display:none; width:120px; margin-top:10px; border-radius:10px;">
+
+    <input type="hidden" id="photoBase64String">
+
 </div>
 
 <!-- IMAGE SCRIPT -->
