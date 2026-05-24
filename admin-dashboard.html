@@ -19,7 +19,7 @@ href="css/style.css">
 /* DASHBOARD */
 
 .dashboard-container{
-    max-width:1200px;
+    max-width:1300px;
     margin:40px auto;
     padding:20px;
 }
@@ -63,6 +63,7 @@ href="css/style.css">
     background:#1e293b;
     color:white;
     outline:none;
+    font-size:15px;
 }
 
 /* TOGGLE */
@@ -82,6 +83,7 @@ href="css/style.css">
     cursor:pointer;
     font-weight:bold;
     transition:0.3s;
+    font-size:15px;
 }
 
 .active-view{
@@ -99,47 +101,58 @@ href="css/style.css">
 .member-grid{
     display:grid;
     grid-template-columns:
-    repeat(auto-fit,minmax(300px,1fr));
+    repeat(auto-fit,minmax(340px,1fr));
     gap:20px;
 }
 
 .member-card{
     background:#1e293b;
     padding:25px;
-    border-radius:15px;
+    border-radius:18px;
     text-align:center;
     box-shadow:
-    0 4px 10px rgba(0,0,0,0.3);
+    0 4px 12px rgba(0,0,0,0.4);
+    transition:0.3s;
+    border:1px solid rgba(255,255,255,0.05);
+}
+
+.member-card:hover{
+    transform:translateY(-4px);
 }
 
 .member-card img{
-    width:100px;
-    height:100px;
+    width:110px;
+    height:110px;
     border-radius:50%;
     object-fit:cover;
-    border:3px solid #22c55e;
+    border:4px solid #22c55e;
     margin-bottom:15px;
 }
 
 .member-card h3{
-    margin-bottom:10px;
+    margin-bottom:12px;
+    font-size:22px;
 }
 
 .member-card p{
     color:#cbd5e1;
-    margin:6px 0;
-    font-size:15px;
+    margin:7px 0;
+    font-size:14px;
+    text-align:left;
+    line-height:1.6;
 }
 
 /* STATUS */
 
 .status{
     display:inline-block;
-    padding:6px 12px;
-    border-radius:20px;
+    padding:7px 15px;
+    border-radius:30px;
     font-size:12px;
     font-weight:bold;
-    margin-top:10px;
+    margin-top:15px;
+    margin-bottom:10px;
+    text-transform:uppercase;
 }
 
 .pending{
@@ -169,17 +182,27 @@ href="css/style.css">
 
 .action-buttons button{
     flex:1;
-    min-width:100px;
+    min-width:120px;
     border:none;
-    padding:10px;
-    border-radius:8px;
+    padding:12px;
+    border-radius:10px;
     cursor:pointer;
     font-weight:bold;
     color:white;
+    transition:0.3s;
+}
+
+.action-buttons button:hover{
+    opacity:0.9;
+    transform:scale(1.02);
 }
 
 .btn-approve{
     background:#22c55e;
+}
+
+.btn-reject{
+    background:#f59e0b;
 }
 
 .btn-edit{
@@ -194,8 +217,9 @@ href="css/style.css">
 
 .empty-state{
     text-align:center;
-    padding:50px;
+    padding:60px;
     color:#94a3b8;
+    font-size:18px;
 }
 
 /* MOBILE */
@@ -209,6 +233,10 @@ href="css/style.css">
 
     .action-buttons{
         flex-direction:column;
+    }
+
+    .member-card{
+        padding:20px;
     }
 
 }
@@ -248,7 +276,8 @@ href="css/style.css">
 
     <h1 style="
     text-align:center;
-    margin-bottom:30px;">
+    margin-bottom:30px;
+    color:white;">
 
         👨‍💼 Church Administration Dashboard
 
@@ -302,7 +331,7 @@ href="css/style.css">
         type="text"
         id="searchInput"
         placeholder=
-        "🔎 Search member by name..."
+        "🔎 Search by name, village, district, pastor, email..."
         onkeyup="filterMembers()">
 
     </div>
@@ -349,7 +378,7 @@ href="css/style.css">
 
 </div>
 
-<!-- DASHBOARD JS -->
+<!-- FIREBASE DASHBOARD ENGINE -->
 <script type="module"
 src="js/dashboard.js"></script>
 
