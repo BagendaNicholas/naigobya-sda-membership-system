@@ -88,7 +88,7 @@ function streamLiveChurchMembers() {
     }
 }
 
-// NEW: CENTRAL INTERFACE RENDER PIPELINE CONTROL
+// CENTRAL INTERFACE RENDER PIPELINE CONTROL
 function renderDashboardInterface() {
     const listDisplayContainer = document.getElementById("membersList");
     const rawSearchInputValue = document.getElementById("searchInput").value.toLowerCase().trim();
@@ -127,6 +127,14 @@ function renderDashboardInterface() {
         const memberName = profileData.name || "Anonymous Member";
         const memberVillage = profileData.address || profileData.village || "Not Provided";
 
+        // FIXED: Safe Image Parsing Engine to read raw Base64 strings correctly
+        let finalUserImageSrc = "";
+        if (profileData.photoURL && profileData.photoURL.trim() !== "") {
+            finalUserImageSrc = profileData.photoURL; 
+        } else {
+            finalUserImageSrc = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(memberName)}`;
+        }
+
         const memberCardElement = document.createElement("div");
         memberCardElement.className = "member-profile-card";
         
@@ -134,9 +142,9 @@ function renderDashboardInterface() {
             // CONDITIONAL VIEW MARGIN: Premium full-row list visualization layout for the Approved Roster
             memberCardElement.style.cssText = "background: rgba(34, 197, 94, 0.04); padding: 20px; border-radius: 12px; border: 1px solid rgba(34, 197, 94, 0.2); text-align: left; margin-top: 15px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;";
             memberCardElement.innerHTML = `
-                <img src="${profileData.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(memberName)}`}" 
+                <img src="${finalUserImageSrc}" 
                      style="width:75px; height:75px; border-radius:50%; object-fit:cover; border: 2px solid #16a34a;"
-                     onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png';">
+                     onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(memberName)}';">
                 <div style="flex: 1; min-width: 200px;">
                     <h3 style="margin: 0 0 6px 0; color: #fff; font-size: 1.2rem;">${memberName}</h3>
                     <p style="margin: 3px 0; font-size: 0.9rem; color: #cbd5e1;">📧 ${profileData.email || "No Email Address"}</p>
@@ -152,9 +160,9 @@ function renderDashboardInterface() {
             // CONDITIONAL VIEW MARGIN: Original Pending Queue view with operational workflow action paths
             memberCardElement.style.cssText = "background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: center; margin-top: 15px;";
             memberCardElement.innerHTML = `
-                <img src="${profileData.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(memberName)}`}" 
+                <img src="${finalUserImageSrc}" 
                      style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom: 12px; border: 2px solid #16a34a;"
-                     onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png';">
+                     onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(memberName)}';">
                 <h3 style="margin: 5px 0; color: #fff;">${memberName}</h3>
                 <p style="margin: 4px 0; font-size: 0.9rem; color: #ccc;">${profileData.email || "No Email"}</p>
                 <p style="margin: 4px 0; font-size: 0.9rem; color: #ccc;">${profileData.phone || "No Phone"}</p>
@@ -174,7 +182,7 @@ function renderDashboardInterface() {
     });
 }
 
-// NEW: VIEW SELECTION CONTROLLER ENTRY POINT
+// VIEW SELECTION CONTROLLER ENTRY POINT
 window.changeDashboardView = function(viewModeTarget) {
     currentFilterView = viewModeTarget;
     
@@ -182,11 +190,9 @@ window.changeDashboardView = function(viewModeTarget) {
     const approvedBtn = document.getElementById("viewApprovedBtn");
 
     if (viewModeTarget === "approved") {
-        // Highlighting active states for approved rosters
         approvedBtn.style.cssText = "background: #16a34a; color: white;";
         allBtn.style.cssText = "background: #1e293b; border: 1px solid rgba(255,255,255,0.1); color: #94a3b8;";
     } else {
-        // Highlighting active states for general workflow queues
         allBtn.style.cssText = "background: #475569; color: white;";
         approvedBtn.style.cssText = "background: #1e293b; border: 1px solid rgba(255,255,255,0.1); color: #94a3b8;";
     }
