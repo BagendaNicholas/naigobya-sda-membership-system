@@ -1,54 +1,170 @@
 // js/register.js
+
 import { auth, db } from "./firebase.js";
-import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
+import {
+  createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+
+import {
+  doc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+
+// REGISTER FUNCTION
 window.registerUser = async function () {
-  const name = document.getElementById("name").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const village = document.getElementById("village").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const photoString = document.getElementById("photoBase64String").value;
-  const loading = document.getElementById("loading");
 
-  if (!name || !phone || !village || !email || !password) {
+  // INPUT VALUES
+  const name =
+  document.getElementById("name").value.trim();
+
+  const dob =
+  document.getElementById("dob").value.trim();
+
+  const country =
+  document.getElementById("country").value.trim();
+
+  const phone =
+  document.getElementById("phone").value.trim();
+
+  const pastor =
+  document.getElementById("pastor").value.trim();
+
+  const baptismDate =
+  document.getElementById("date").value.trim();
+
+  const district =
+  document.getElementById("district").value.trim();
+
+  const village =
+  document.getElementById("village").value.trim();
+
+  const email =
+  document.getElementById("email").value.trim();
+
+  const password =
+  document.getElementById("password").value.trim();
+
+  const photoString =
+  document.getElementById("photoBase64String").value;
+
+  const loading =
+  document.getElementById("loading");
+
+
+  // VALIDATION
+  if(
+    !name ||
+    !dob ||
+    !country ||
+    !phone ||
+    !pastor ||
+    !baptismDate ||
+    !district ||
+    !village ||
+    !email ||
+    !password
+  ){
+
     alert("⚠️ Please fill all fields.");
     return;
+
   }
 
-  if (password.length < 6) {
-    alert("⚠️ Password must be at least 6 characters.");
+
+  // PASSWORD CHECK
+  if(password.length < 6){
+
+    alert(
+      "⚠️ Password must be at least 6 characters."
+    );
+
     return;
+
   }
 
-  try {
+
+  try{
+
+    // SHOW LOADING
     loading.style.display = "block";
 
-    // Create user authentication node
-    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+    // CREATE FIREBASE AUTH ACCOUNT
+    const userCred =
+    await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
     const user = userCred.user;
 
-    // Save user metrics directly into Firestore, converting photoString into text field data
-    await setDoc(doc(db, "members", user.uid), {
-      uid: user.uid,
-      name: name,
-      phone: phone,
-      address: village, 
-      email: email,
-      photoURL: photoString || "", // Injects Base64 data directly, bypassing Cloud Storage rules entirely
-      status: "pending",
-      role: "member",
-      createdAt: new Date().toISOString()
-    });
 
-    alert("✅ Registration Successful!");
-    window.location.href = "index.html";
+    // SAVE MEMBER DATA
+    await setDoc(
+      doc(db, "members", user.uid),
+      {
 
-  } catch (error) {
-    console.error(error);
-    alert(error.message);
-  } finally {
-    loading.style.display = "none";
+        uid: user.uid,
+
+        fullName: name,
+
+        dateOfBirth: dob,
+
+        country: country,
+
+        phoneNumber: phone,
+
+        pastor: pastor,
+
+        baptismDate: baptismDate,
+
+        district: district,
+
+        village: village,
+
+        email: email,
+
+        photoURL:
+        photoString || "",
+
+        status: "pending",
+
+        role: "member",
+
+        church:
+        "Naigobya SDA Church",
+
+        createdAt:
+        new Date().toISOString()
+
+      }
+    );
+
+
+    // SUCCESS
+    alert(
+      "✅ Registration Successful!"
+    );
+
+    // REDIRECT
+    window.location.href =
+    "index.html";
+
   }
+  catch(error){
+
+    console.error(error);
+
+    alert(error.message);
+
+  }
+  finally{
+
+    // HIDE LOADING
+    loading.style.display = "none";
+
+  }
+
 };
