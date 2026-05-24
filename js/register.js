@@ -3,72 +3,112 @@ import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-// Listen for form submission instead of relying on an inline onclick attribute
-document.getElementById("registrationForm").addEventListener("submit", async function (e) {
-  e.preventDefault(); // Prevents page from reloading prematurely
+window.registerUser = async function () {
+const name = document.getElementById("name").value.trim();
+const phone = document.getElementById("phone").value.trim();
+const village = document.getElementById("village").value.trim();
+const email = document.getElementById("email").value.trim();
+const password = document.getElementById("password").value.trim();
+const photoString = document.getElementById("photoBase64String").value;
+const loading = document.getElementById("loading");
 
-  // GET INPUT VALUES
-  const fullName = document.getElementById("fullName").value.trim();
-  const dob = document.getElementById("dob").value;
-  const gender = document.getElementById("gender").value;
-  const phone = document.getElementById("phone").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-  const address = document.getElementById("address").value.trim();
-  const village = document.getElementById("village").value.trim();
-  const baptismStatus = document.getElementById("baptismStatus").value.trim();
-  const churchRole = document.getElementById("churchRole").value.trim();
-  const dateJoined = document.getElementById("dateJoined").value;
-  const photoString = document.getElementById("photoBase64String").value;
-  const loading = document.getElementById("loading");
+if (!name || !phone || !village || !email || !password) {
+alert("⚠️ Please fill all fields.");
+return;
+}
 
-  // MANUAL VALIDATION FALLBACK
-  if (!fullName || !dob || !gender || !phone || !email || !password || !village) {
-    alert("⚠️ Please fill all required fields.");
-    return;
-  }
+if (password.length < 6) {
+alert("⚠️ Password must be at least 6 characters.");
+return;
+}
 
-  if (password.length < 6) {
-    alert("⚠️ Password must be at least 6 characters.");
-    return;
-  }
+try {
+loading.style.display = "block";
 
-  try {
-    // SHOW LOADING
-    if (loading) loading.style.display = "block";
+// Create user authentication node  
+const userCred = await createUserWithEmailAndPassword(auth, email, password);  
+const user = userCred.user;  
 
-    // CREATE AUTH USER
-    const userCred = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCred.user;
+// Save user metrics directly into Firestore, converting photoString into text field data  
+await setDoc(doc(db, "members", user.uid), {  
+  uid: user.uid,  
+  name: name,  
+  phone: phone,  
+  address: village,   
+  email: email,  
+  photoURL: photoString || "", // Injects Base64 data directly, bypassing Cloud Storage rules entirely  
+  status: "pending",  
+  role: "member",  
+  createdAt: new Date().toISOString()  
+});  
 
-    // SAVE MEMBER DATA
-    await setDoc(doc(db, "members", user.uid), {
-      uid: user.uid,
-      fullName,
-      dateOfBirth: dob,
-      gender,
-      phoneNumber: phone,
-      email,
-      address,
-      village,
-      baptismStatus,
-      churchRole,
-      dateJoined,
-      photoURL: photoString || "",
-      church: "Naigobya SDA Church",
-      role: "member",
-      status: "pending",
-      createdAt: new Date().toISOString()
-    });
+alert("✅ Registration Successful!");  
+window.location.href = "index.html";
 
-    alert("✅ Registration Successful!");
-    window.location.href = "index.html";
+} catch (error) {
+console.error(error);
+alert(error.message);
+} finally {
+loading.style.display = "none";
+}
+};
 
-  } catch (error) {
-    console.error("Registration Error:", error);
-    alert(error.message);
-  } finally {
-    // HIDE LOADING
-    if (loading) loading.style.display = "none";
-  }
-});
+To have also
+
+<div class="input-box">  
+        <input type="text" id="name" placeholder="Full Name">  
+    </div>  <div class="input-box">  
+    <input type="text" id="dob" placeholder="Date Of Birth">  
+</div>  
+
+<div class="input-box">  
+    <input type="text" id="country" placeholder="Country">  
+</div>  
+
+<div class="input-box">  
+    <input type="text" id="phone" placeholder="Phone Number">  
+</div>  
+
+<div class="input-box">  
+    <input type="text" id="pastor" placeholder="Pastor/Omusumba">  
+</div>  
+
+<div class="input-box">  
+    <input type="text" id="date" placeholder="Baptism Date">  
+</div>  
+
+<div class="input-box">  
+    <input type="text" id="district" placeholder="District">  
+</div>  
+  
+<div class="input-box">  
+    <input type="text" id="village" placeholder="Village">  
+</div>  
+
+<div class="input-box">  
+    <input type="email" id="email" placeholder="Email Address">  
+</div>  
+
+<div class="input-box">  
+    <input type="password" id="password" placeholder="Password">  
+</div>  
+
+<div class="file-box">  
+    <label style="color: #cbd5e1; font-size: 0.9rem;">Select Profile Photo</label><br><br>  
+    <input type="file" id="photo" accept="image/*">  
+    <input type="hidden" id="photoBase64String" value="">  
+</div>  
+
+<div class="preview">  
+    <img id="previewImage" alt="Profile Preview">  
+</div>  
+
+<button onclick="registerUser()">  
+    Register Member  
+</button>  
+
+<div id="loading">  
+    ⏳ Uploading Profile Photo & Registering...  
+</div>
+
+</div>  
