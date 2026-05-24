@@ -15,64 +15,29 @@ import {
 // REGISTER FUNCTION
 window.registerUser = async function () {
 
-  // INPUT VALUES (MATCH HTML IDS EXACTLY)
-  const fullName =
-  document.getElementById("fullName").value.trim();
-
-  const dob =
-  document.getElementById("dob").value;
-
-  const gender =
-  document.getElementById("gender").value;
-
-  const phone =
-  document.getElementById("phone").value.trim();
-
-  const email =
-  document.getElementById("email").value.trim();
-
-  const password =
-  document.getElementById("password").value.trim();
-
-  const address =
-  document.getElementById("address").value.trim();
-
-  const village =
-  document.getElementById("village").value.trim();
-
-  const baptismStatus =
-  document.getElementById("baptismStatus").value.trim();
-
-  const churchRole =
-  document.getElementById("churchRole").value.trim();
-
-  const dateJoined =
-  document.getElementById("dateJoined").value;
-
-  const photoString =
-  document.getElementById("photoBase64String").value;
-
-  const loading =
-  document.getElementById("loading");
+  // GET INPUT VALUES
+  const fullName = document.getElementById("fullName").value.trim();
+  const dob = document.getElementById("dob").value;
+  const gender = document.getElementById("gender").value;
+  const phone = document.getElementById("phone").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const address = document.getElementById("address").value.trim();
+  const village = document.getElementById("village").value.trim();
+  const baptismStatus = document.getElementById("baptismStatus").value.trim();
+  const churchRole = document.getElementById("churchRole").value.trim();
+  const dateJoined = document.getElementById("dateJoined").value;
+  const photoString = document.getElementById("photoBase64String").value;
+  const loading = document.getElementById("loading");
 
 
   // VALIDATION
-  if(
-    !fullName ||
-    !dob ||
-    !gender ||
-    !phone ||
-    !email ||
-    !password ||
-    !village
-  ){
+  if (!fullName || !dob || !gender || !phone || !email || !password || !village) {
     alert("⚠️ Please fill all required fields.");
     return;
   }
 
-
-  // PASSWORD RULE
-  if(password.length < 6){
+  if (password.length < 6) {
     alert("⚠️ Password must be at least 6 characters.");
     return;
   }
@@ -84,53 +49,44 @@ window.registerUser = async function () {
     if (loading) loading.style.display = "block";
 
 
-    // CREATE FIREBASE AUTH USER
-    const userCred =
-    await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-
+    // CREATE AUTH USER (MEMBER CHOOSES PASSWORD)
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCred.user;
 
 
-    // SAVE MEMBER DATA TO FIRESTORE
+    // SAVE MEMBER DATA
     await setDoc(doc(db, "members", user.uid), {
 
       uid: user.uid,
-      fullName: fullName,
+      fullName,
       dateOfBirth: dob,
-      gender: gender,
+      gender,
       phoneNumber: phone,
-      email: email,
-      address: address,
-      village: village,
-      baptismStatus: baptismStatus,
-      churchRole: churchRole,
-      dateJoined: dateJoined,
+      email,
+      address,
+      village,
+      baptismStatus,
+      churchRole,
+      dateJoined,
       photoURL: photoString || "",
 
       church: "Naigobya SDA Church",
       role: "member",
       status: "pending",
-
       createdAt: new Date().toISOString()
 
     });
 
 
     alert("✅ Registration Successful!");
-
-    // REDIRECT
     window.location.href = "index.html";
 
   }
-  catch(error){
+  catch (error) {
     console.error("Registration Error:", error);
     alert(error.message);
   }
-  finally{
+  finally {
     if (loading) loading.style.display = "none";
   }
 
