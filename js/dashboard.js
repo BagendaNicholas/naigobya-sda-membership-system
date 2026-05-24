@@ -42,7 +42,6 @@ auth,
 
     }
 
-    // ACCESS CHECK
     if(
     user.email.toLowerCase()
     !==
@@ -60,13 +59,12 @@ auth,
 
     }
 
-    // LOAD MEMBERS
     loadMembers();
 
 });
 
 
-// LIVE MEMBER STREAM
+// LOAD MEMBERS
 function loadMembers(){
 
     const membersRef =
@@ -104,8 +102,6 @@ function loadMembers(){
 
         });
 
-
-        // UPDATE STATS
         document.getElementById(
         "totalMembers"
         ).innerText = total;
@@ -118,8 +114,6 @@ function loadMembers(){
         "approvedMembers"
         ).innerText = approved;
 
-
-        // RENDER
         renderMembers();
 
     });
@@ -169,9 +163,10 @@ function renderMembers(){
     filtered =
     filtered.filter(member=>{
 
-        const name =
+        const fullName =
         (
         member.fullName ||
+        member.name ||
         ""
         ).toLowerCase();
 
@@ -187,10 +182,31 @@ function renderMembers(){
         ""
         ).toLowerCase();
 
+        const district =
+        (
+        member.district ||
+        ""
+        ).toLowerCase();
+
+        const pastor =
+        (
+        member.pastor ||
+        ""
+        ).toLowerCase();
+
+        const country =
+        (
+        member.country ||
+        ""
+        ).toLowerCase();
+
         return(
-            name.includes(searchText) ||
+            fullName.includes(searchText) ||
             email.includes(searchText) ||
-            village.includes(searchText)
+            village.includes(searchText) ||
+            district.includes(searchText) ||
+            pastor.includes(searchText) ||
+            country.includes(searchText)
         );
 
     });
@@ -224,7 +240,7 @@ function renderMembers(){
         const photo =
         member.photoURL ||
 
-        `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(member.fullName || "Member")}`;
+        `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(member.fullName || member.name || "Member")}`;
 
 
         // STATUS
@@ -241,7 +257,7 @@ function renderMembers(){
             src="${photo}">
 
             <h3>
-                ${member.fullName || "Church Member"}
+                ${member.fullName || member.name || "Church Member"}
             </h3>
 
             <p>
@@ -249,11 +265,31 @@ function renderMembers(){
             </p>
 
             <p>
-                📞 ${member.phoneNumber || "No Phone"}
+                📞 ${member.phone || member.phoneNumber || "No Phone"}
+            </p>
+
+            <p>
+                🌍 ${member.country || "No Country"}
+            </p>
+
+            <p>
+                🏘 ${member.district || "No District"}
             </p>
 
             <p>
                 📍 ${member.village || "Unknown Village"}
+            </p>
+
+            <p>
+                ⛪ Pastor: ${member.pastor || "Not Provided"}
+            </p>
+
+            <p>
+                🎂 DOB: ${member.dob || "Not Provided"}
+            </p>
+
+            <p>
+                💧 Baptism: ${member.date || "Not Provided"}
             </p>
 
             <div class="status ${status}">
@@ -268,9 +304,7 @@ function renderMembers(){
                 window.location.href=
                 'church-members.html?uid=${member.id}'
                 ">
-
                     ✏️ Edit
-
                 </button>
 
                 <button
@@ -278,9 +312,15 @@ function renderMembers(){
                 onclick="
                 approveMember('${member.id}')
                 ">
-
                     ✅ Approve
+                </button>
 
+                <button
+                class="btn-reject"
+                onclick="
+                rejectMember('${member.id}')
+                ">
+                    ❌ Reject
                 </button>
 
                 <button
@@ -288,9 +328,7 @@ function renderMembers(){
                 onclick="
                 deleteMember('${member.id}')
                 ">
-
                     🗑 Delete
-
                 </button>
 
             </div>
@@ -320,8 +358,6 @@ function(view){
     "viewApprovedBtn"
     );
 
-
-    // RESET
     allBtn.classList.remove(
     "active-view"
     );
@@ -338,8 +374,6 @@ function(view){
     "inactive-view"
     );
 
-
-    // ACTIVATE
     if(view === "all"){
 
         allBtn.classList.remove(
@@ -377,7 +411,7 @@ function(){
 };
 
 
-// APPROVE MEMBER
+// APPROVE
 window.approveMember =
 async function(uid){
 
@@ -408,7 +442,38 @@ async function(uid){
 };
 
 
-// DELETE MEMBER
+// REJECT
+window.rejectMember =
+async function(uid){
+
+    try{
+
+        await updateDoc(
+            doc(db, "members", uid),
+            {
+                status: "rejected"
+            }
+        );
+
+        alert(
+        "❌ Member Rejected"
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(
+        "⚠️ Failed to reject member."
+        );
+
+    }
+
+};
+
+
+// DELETE
 window.deleteMember =
 async function(uid){
 
