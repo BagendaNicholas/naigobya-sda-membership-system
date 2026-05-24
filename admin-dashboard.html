@@ -1,151 +1,97 @@
-import { auth, db } from "./firebase.js";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-import {
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+<title>Admin Dashboard | SDA Church</title>
 
-import {
-  collection,
-  getDocs,
-  updateDoc,
-  doc
-} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+<link rel="stylesheet" href="css/style.css">
 
-
-// ADMIN EMAIL
-const ADMIN_EMAIL = "nicholasbagenda@gmail.com";
-
-let membersCache = [];
-
-
-// AUTH CHECK
-onAuthStateChanged(auth, async (user) => {
-
-  if (!user) {
-    window.location.href = "admin-login.html";
-    return;
-  }
-
-  if (user.email !== ADMIN_EMAIL) {
-    alert("❌ Access Denied");
-    window.location.href = "index.html";
-    return;
-  }
-
-  loadMembers();
-});
-
-
-// LOGOUT
-window.logoutAdmin = async function () {
-  await signOut(auth);
-  window.location.href = "index.html";
-};
-
-
-// LOAD MEMBERS FROM FIRESTORE
-async function loadMembers() {
-
-  const membersList = document.getElementById("membersList");
-  membersList.innerHTML = "";
-
-  membersCache = [];
-
-  let total = 0;
-  let pending = 0;
-  let approved = 0;
-
-  const snapshot = await getDocs(collection(db, "members"));
-
-  snapshot.forEach((docSnap) => {
-
-    const data = docSnap.data();
-    const id = docSnap.id;
-
-    membersCache.push({ id, ...data });
-
-    total++;
-
-    if (data.status === "pending") pending++;
-    if (data.status === "approved") approved++;
-
-    const card = document.createElement("div");
-    card.className = "card";
-
-    card.innerHTML = `
-      <div style="text-align:center">
-
-        <img src="${data.photoURL || 'https://via.placeholder.com/80'}"
-        style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
-
-        <h3>${data.name || "No Name"}</h3>
-        <p>${data.email || "No Email"}</p>
-        <p>${data.phone || "No Phone"}</p>
-        <p>${data.address || ""}</p>
-
-        <p>Status: <b>${data.status || "pending"}</b></p>
-
-        <button onclick="approveMember('${id}')"
-        style="background:#16a34a;color:white;margin-top:8px;">
-          ✅ Approve
-        </button>
-
-        <button onclick="rejectMember('${id}')"
-        style="background:red;color:white;margin-top:8px;">
-          ❌ Reject
-        </button>
-
-      </div>
-    `;
-
-    membersList.appendChild(card);
-  });
-
-  // UPDATE STATS
-  document.getElementById("totalMembers").innerText = total;
-  document.getElementById("pendingMembers").innerText = pending;
-  document.getElementById("approvedMembers").innerText = approved;
+<style>
+.card img{
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    object-fit:cover;
+    margin-bottom:10px;
 }
 
+.card{
+    padding:15px;
+    margin-bottom:15px;
+    text-align:center;
+}
 
-// APPROVE MEMBER
-window.approveMember = async function (id) {
+button{
+    padding:8px 12px;
+    margin:5px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+</style>
 
-  await updateDoc(doc(db, "members", id), {
-    status: "approved"
-  });
+</head>
 
-  loadMembers();
-};
+<body>
 
+<!-- NAVBAR -->
+<div class="navbar">
 
-// REJECT MEMBER
-window.rejectMember = async function (id) {
+    <div class="logo">
+        ⛪ SDA Admin
+    </div>
 
-  await updateDoc(doc(db, "members", id), {
-    status: "rejected"
-  });
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="church-members.html">Members</a>
+        <a href="#" onclick="logoutAdmin()">Logout</a>
+    </div>
 
-  loadMembers();
-};
+</div>
 
+<!-- CONTAINER -->
+<div class="container">
 
-// SEARCH MEMBERS
-window.filterMembers = function () {
+    <h2>👨‍💼 Church Admin Dashboard</h2>
 
-  const value = document.getElementById("searchInput").value.toLowerCase();
+    <!-- STATS -->
+    <div id="stats"
+    style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin-bottom:25px;">
 
-  const cards = document.querySelectorAll(".card");
+        <div class="card">
+            <h3 id="totalMembers">0</h3>
+            <p>Total Members</p>
+        </div>
 
-  cards.forEach((card) => {
+        <div class="card">
+            <h3 id="pendingMembers">0</h3>
+            <p>Pending</p>
+        </div>
 
-    const text = card.innerText.toLowerCase();
+        <div class="card">
+            <h3 id="approvedMembers">0</h3>
+            <p>Approved</p>
+        </div>
 
-    if (text.includes(value)) {
-      card.style.display = "block";
-    } else {
-      card.style.display = "none";
-    }
-  });
-};
+    </div>
+
+    <!-- SEARCH -->
+    <div class="input-box">
+        <input
+        type="text"
+        id="searchInput"
+        placeholder="Search member by name, email or phone..."
+        onkeyup="filterMembers()">
+    </div>
+
+    <!-- MEMBERS LIST -->
+    <div id="membersList"></div>
+
+</div>
+
+<script type="module" src="js/dashboard.js"></script>
+
+</body>
+</html>
