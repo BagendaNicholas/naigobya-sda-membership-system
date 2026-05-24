@@ -1,84 +1,151 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+import { auth, db } from "./firebase.js";
 
-<title>Admin Dashboard | SDA Church</title>
+import {
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
-<link rel="stylesheet"
-href="css/style.css">
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-</head>
 
-<body>
+// ADMIN EMAIL
+const ADMIN_EMAIL = "nicholasbagenda@gmail.com";
 
-<!-- NAVBAR -->
-<div class="navbar">
+let membersCache = [];
 
-    <div class="logo">
-        ⛪ SDA Admin
-    </div>
 
-    <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="church-members.html">Members</a>
-        <a href="#" onclick="logoutAdmin()">Logout</a>
-    </div>
+// AUTH CHECK
+onAuthStateChanged(auth, async (user) => {
 
-</div>
+  if (!user) {
+    window.location.href = "admin-login.html";
+    return;
+  }
 
-<!-- CONTAINER -->
-<div class="container">
+  if (user.email !== ADMIN_EMAIL) {
+    alert("❌ Access Denied");
+    window.location.href = "index.html";
+    return;
+  }
 
-    <h2>
-        👨‍💼 Church Admin Dashboard
-    </h2>
+  loadMembers();
+});
 
-    <!-- STATS -->
-    <div id="stats"
-    style="
-    display:grid;
-    grid-template-columns:
-    repeat(auto-fit,minmax(150px,1fr));
-    gap:15px;
-    margin-bottom:25px;
-    ">
 
-        <div class="card">
-            <h3 id="totalMembers">0</h3>
-            <p>Total Members</p>
-        </div>
+// LOGOUT
+window.logoutAdmin = async function () {
+  await signOut(auth);
+  window.location.href = "index.html";
+};
 
-        <div class="card">
-            <h3 id="pendingMembers">0</h3>
-            <p>Pending</p>
-        </div>
 
-        <div class="card">
-            <h3 id="approvedMembers">0</h3>
-            <p>Approved</p>
-        </div>
+// LOAD MEMBERS FROM FIRESTORE
+async function loadMembers() {
 
-    </div>
+  const membersList = document.getElementById("membersList");
+  membersList.innerHTML = "";
 
-    <!-- SEARCH -->
-    <div class="input-box">
-        <input
-        type="text"
-        id="searchInput"
-        placeholder="Search member by name..."
-        onkeyup="filterMembers()">
-    </div>
+  membersCache = [];
 
-    <!-- MEMBERS -->
-    <div id="membersList"></div>
+  let total = 0;
+  let pending = 0;
+  let approved = 0;
 
-</div>
+  const snapshot = await getDocs(collection(db, "members"));
 
-<script type="module"
-src="js/dashboard.js"></script>
+  snapshot.forEach((docSnap) => {
 
-</body>
-</html>
+    const data = docSnap.data();
+    const id = docSnap.id;
+
+    membersCache.push({ id, ...data });
+
+    total++;
+
+    if (data.status === "pending") pending++;
+    if (data.status === "approved") approved++;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <div style="text-align:center">
+
+        <img src="${data.photoURL || 'https://via.placeholder.com/80'}"
+        style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
+
+        <h3>${data.name || "No Name"}</h3>
+        <p>${data.email || "No Email"}</p>
+        <p>${data.phone || "No Phone"}</p>
+        <p>${data.address || ""}</p>
+
+        <p>Status: <b>${data.status || "pending"}</b></p>
+
+        <button onclick="approveMember('${id}')"
+        style="background:#16a34a;color:white;margin-top:8px;">
+          ✅ Approve
+        </button>
+
+        <button onclick="rejectMember('${id}')"
+        style="background:red;color:white;margin-top:8px;">
+          ❌ Reject
+        </button>
+
+      </div>
+    `;
+
+    membersList.appendChild(card);
+  });
+
+  // UPDATE STATS
+  document.getElementById("totalMembers").innerText = total;
+  document.getElementById("pendingMembers").innerText = pending;
+  document.getElementById("approvedMembers").innerText = approved;
+}
+
+
+// APPROVE MEMBER
+window.approveMember = async function (id) {
+
+  await updateDoc(doc(db, "members", id), {
+    status: "approved"
+  });
+
+  loadMembers();
+};
+
+
+// REJECT MEMBER
+window.rejectMember = async function (id) {
+
+  await updateDoc(doc(db, "members", id), {
+    status: "rejected"
+  });
+
+  loadMembers();
+};
+
+
+// SEARCH MEMBERS
+window.filterMembers = function () {
+
+  const value = document.getElementById("searchInput").value.toLowerCase();
+
+  const cards = document.querySelectorAll(".card");
+
+  cards.forEach((card) => {
+
+    const text = card.innerText.toLowerCase();
+
+    if (text.includes(value)) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+  });
+};
