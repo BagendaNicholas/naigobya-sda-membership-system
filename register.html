@@ -153,8 +153,8 @@ photoInput.addEventListener("change", function(){
     const file = this.files[0];  
     if (file) {  
         // Enforce the 2MB size cap right here on the client interface to protect Firestore limits  
-        if (file.size > 1024 * 1024) {   
-            alert("⚠️ To keep registrations free, please choose an image smaller than 1MB.");  
+        if (file.size > 5 * 1024 * 1024) {   
+            alert("⚠️ To keep registrations free, please choose an image smaller than 5MB.");  
             this.value = "";  
             previewImage.style.display = "none";  
             base64HiddenInput.value = "";  
