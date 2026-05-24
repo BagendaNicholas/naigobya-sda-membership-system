@@ -3,36 +3,25 @@
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<title>Register Member | SDA Church</title>
 
-<title>
-Register Member | SDA Church
-</title>
-
-<link rel="stylesheet"
-href="css/style.css">
+<link rel="stylesheet" href="css/style.css">
 
 </head>
 
 <body>
 
 <div class="navbar">
-
-    <div class="logo">
-        ⛪ Naigobya SDA
-    </div>
-
+    <div class="logo">⛪ Naigobya SDA</div>
 </div>
 
 <div class="form-container">
 
-    <h2>
-        Church Member Registration
-    </h2>
+    <h2>Church Member Registration</h2>
 
-    <!-- INPUTS HERE -->
+    <!-- INPUT FIELDS -->
 
     <div class="input-box">
         <input type="text" id="fullName" placeholder="Full Name" required>
@@ -55,7 +44,11 @@ href="css/style.css">
     </div>
 
     <div class="input-box">
-        <input type="email" id="email" placeholder="Email Address">
+        <input type="email" id="email" placeholder="Email Address" required>
+    </div>
+
+    <div class="input-box">
+        <input type="password" id="password" placeholder="Create Password" required>
     </div>
 
     <div class="input-box">
@@ -67,102 +60,77 @@ href="css/style.css">
     </div>
 
     <div class="input-box">
-        <input type="text" id="baptismStatus" placeholder="Baptism Status (Baptized / Not Baptized)">
+        <input type="text" id="baptismStatus" placeholder="Baptism Status">
     </div>
 
     <div class="input-box">
-        <input type="text" id="churchRole" placeholder="Church Role (Member, Deacon, Choir etc)">
+        <input type="text" id="churchRole" placeholder="Church Role">
     </div>
 
     <div class="input-box">
-        <input type="date" id="dateJoined" placeholder="Date Joined Church">
+        <input type="date" id="dateJoined">
     </div>
 
+    <!-- PHOTO UPLOAD -->
     <div class="input-box">
         <input type="file" id="photo" accept="image/*">
     </div>
 
-    <img id="previewImage" style="display:none; width:120px; margin-top:10px; border-radius:10px;">
+    <img id="previewImage"
+         style="display:none; width:120px; margin-top:10px; border-radius:10px;">
 
     <input type="hidden" id="photoBase64String">
 
+    <!-- REGISTER BUTTON -->
+    <div class="input-box">
+        <button onclick="registerUser()">
+            Register Member
+        </button>
+    </div>
+
 </div>
 
-<!-- IMAGE SCRIPT -->
+<!-- IMAGE PREVIEW SCRIPT -->
 <script>
 
-const photoInput =
-document.getElementById("photo");
+const photoInput = document.getElementById("photo");
+const previewImage = document.getElementById("previewImage");
+const base64HiddenInput = document.getElementById("photoBase64String");
 
-const previewImage =
-document.getElementById("previewImage");
+photoInput.addEventListener("change", function () {
 
-const base64HiddenInput =
-document.getElementById(
-"photoBase64String"
-);
+    const file = this.files[0];
 
+    if (!file) return;
 
-// IMAGE CONVERTER
-photoInput.addEventListener(
-"change",
-function(){
+    if (file.size > 1024 * 1024) {
 
-    const file =
-    this.files[0];
+        alert("⚠️ Please choose image below 1MB.");
 
-    if(file){
-
-        // 1MB LIMIT
-        if(file.size > 1024 * 1024){
-
-            alert(
-            "⚠️ Please choose image below 1MB."
-            );
-
-            this.value = "";
-
-            previewImage.style.display =
-            "none";
-
-            base64HiddenInput.value =
-            "";
-
-            return;
-
-        }
-
-        const reader =
-        new FileReader();
-
-        reader.onload =
-        function(e){
-
-            const imageString =
-            e.target.result;
-
-            previewImage.src =
-            imageString;
-
-            previewImage.style.display =
-            "block";
-
-            base64HiddenInput.value =
-            imageString;
-
-        };
-
-        reader.readAsDataURL(file);
-
+        this.value = "";
+        previewImage.style.display = "none";
+        base64HiddenInput.value = "";
+        return;
     }
+
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+
+        previewImage.src = e.target.result;
+        previewImage.style.display = "block";
+
+        base64HiddenInput.value = e.target.result;
+    };
+
+    reader.readAsDataURL(file);
 
 });
 
 </script>
 
-<!-- REGISTER SCRIPT -->
-<script type="module"
-src="js/register.js"></script>
+<!-- REGISTER LOGIC -->
+<script type="module" src="js/register.js"></script>
 
 </body>
 </html>
