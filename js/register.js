@@ -15,36 +15,39 @@ import {
 // REGISTER FUNCTION
 window.registerUser = async function () {
 
-  // INPUT VALUES
-  const name =
-  document.getElementById("name").value.trim();
+  // INPUT VALUES (MATCH HTML IDS EXACTLY)
+  const fullName =
+  document.getElementById("fullName").value.trim();
 
   const dob =
-  document.getElementById("dob").value.trim();
+  document.getElementById("dob").value;
 
-  const country =
-  document.getElementById("country").value.trim();
+  const gender =
+  document.getElementById("gender").value;
 
   const phone =
   document.getElementById("phone").value.trim();
-
-  const pastor =
-  document.getElementById("pastor").value.trim();
-
-  const baptismDate =
-  document.getElementById("date").value.trim();
-
-  const district =
-  document.getElementById("district").value.trim();
-
-  const village =
-  document.getElementById("village").value.trim();
 
   const email =
   document.getElementById("email").value.trim();
 
   const password =
   document.getElementById("password").value.trim();
+
+  const address =
+  document.getElementById("address").value.trim();
+
+  const village =
+  document.getElementById("village").value.trim();
+
+  const baptismStatus =
+  document.getElementById("baptismStatus").value.trim();
+
+  const churchRole =
+  document.getElementById("churchRole").value.trim();
+
+  const dateJoined =
+  document.getElementById("dateJoined").value;
 
   const photoString =
   document.getElementById("photoBase64String").value;
@@ -55,42 +58,33 @@ window.registerUser = async function () {
 
   // VALIDATION
   if(
-    !name ||
+    !fullName ||
     !dob ||
-    !country ||
+    !gender ||
     !phone ||
-    !pastor ||
-    !baptismDate ||
-    !district ||
-    !village ||
     !email ||
-    !password
+    !password ||
+    !village
   ){
-
-    alert("⚠️ Please fill all fields.");
+    alert("⚠️ Please fill all required fields.");
     return;
-
   }
 
 
-  // PASSWORD CHECK
+  // PASSWORD RULE
   if(password.length < 6){
-
-    alert(
-      "⚠️ Password must be at least 6 characters."
-    );
-
+    alert("⚠️ Password must be at least 6 characters.");
     return;
-
   }
 
 
-  try{
+  try {
 
     // SHOW LOADING
-    loading.style.display = "block";
+    if (loading) loading.style.display = "block";
 
-    // CREATE FIREBASE AUTH ACCOUNT
+
+    // CREATE FIREBASE AUTH USER
     const userCred =
     await createUserWithEmailAndPassword(
       auth,
@@ -101,70 +95,43 @@ window.registerUser = async function () {
     const user = userCred.user;
 
 
-    // SAVE MEMBER DATA
-    await setDoc(
-      doc(db, "members", user.uid),
-      {
+    // SAVE MEMBER DATA TO FIRESTORE
+    await setDoc(doc(db, "members", user.uid), {
 
-        uid: user.uid,
+      uid: user.uid,
+      fullName: fullName,
+      dateOfBirth: dob,
+      gender: gender,
+      phoneNumber: phone,
+      email: email,
+      address: address,
+      village: village,
+      baptismStatus: baptismStatus,
+      churchRole: churchRole,
+      dateJoined: dateJoined,
+      photoURL: photoString || "",
 
-        fullName: name,
+      church: "Naigobya SDA Church",
+      role: "member",
+      status: "pending",
 
-        dateOfBirth: dob,
+      createdAt: new Date().toISOString()
 
-        country: country,
-
-        phoneNumber: phone,
-
-        pastor: pastor,
-
-        baptismDate: baptismDate,
-
-        district: district,
-
-        village: village,
-
-        email: email,
-
-        photoURL:
-        photoString || "",
-
-        status: "pending",
-
-        role: "member",
-
-        church:
-        "Naigobya SDA Church",
-
-        createdAt:
-        new Date().toISOString()
-
-      }
-    );
+    });
 
 
-    // SUCCESS
-    alert(
-      "✅ Registration Successful!"
-    );
+    alert("✅ Registration Successful!");
 
     // REDIRECT
-    window.location.href =
-    "index.html";
+    window.location.href = "index.html";
 
   }
   catch(error){
-
-    console.error(error);
-
+    console.error("Registration Error:", error);
     alert(error.message);
-
   }
   finally{
-
-    // HIDE LOADING
-    loading.style.display = "none";
-
+    if (loading) loading.style.display = "none";
   }
 
 };
