@@ -1,111 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard | SDA Church</title>
-<link rel="stylesheet" href="css/style.css">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+Admin Dashboard | Naigobya SDA
+</title>
+
+<link rel="stylesheet"
+href="css/style.css">
+
 <style>
-/* Custom style additions to align your new Action controls beautifully */
-.member-card {
-    background: #1e293b;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 15px;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+
+/* DASHBOARD */
+
+.dashboard-container{
+    max-width:1200px;
+    margin:40px auto;
+    padding:20px;
 }
-.member-card img {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #22c55e;
-    margin-bottom: 10px;
+
+/* STATS */
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+    margin-bottom:30px;
 }
-.btn-edit {
-    background: #0284c7;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    margin-top: 10px;
-    transition: 0.2s;
+
+.stats-card{
+    background:#1e293b;
+    padding:25px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:
+    0 4px 10px rgba(0,0,0,0.3);
 }
-.btn-edit:hover {
-    background: #0369a1;
+
+.stats-card h2{
+    font-size:35px;
+    color:#22c55e;
+    margin-bottom:10px;
 }
-.action-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
+
+/* SEARCH */
+
+.search-box{
+    margin-bottom:20px;
 }
-/* Style wrapper for the list toggle layout controls */
-.toggle-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 25px;
+
+.search-box input{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:#1e293b;
+    color:white;
+    outline:none;
 }
-.view-btn {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: bold;
-    cursor: pointer;
-    color: white;
-    transition: background 0.2s ease;
+
+/* TOGGLE */
+
+.toggle-container{
+    display:flex;
+    gap:15px;
+    margin-bottom:25px;
+    flex-wrap:wrap;
 }
+
+.view-btn{
+    flex:1;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.active-view{
+    background:#22c55e;
+    color:white;
+}
+
+.inactive-view{
+    background:#1e293b;
+    color:#94a3b8;
+}
+
+/* MEMBER CARDS */
+
+.member-grid{
+    display:grid;
+    grid-template-columns:
+    repeat(auto-fit,minmax(300px,1fr));
+    gap:20px;
+}
+
+.member-card{
+    background:#1e293b;
+    padding:25px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:
+    0 4px 10px rgba(0,0,0,0.3);
+}
+
+.member-card img{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #22c55e;
+    margin-bottom:15px;
+}
+
+.member-card h3{
+    margin-bottom:10px;
+}
+
+.member-card p{
+    color:#cbd5e1;
+    margin:6px 0;
+    font-size:15px;
+}
+
+/* STATUS */
+
+.status{
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.pending{
+    background:#f59e0b;
+    color:white;
+}
+
+.approved{
+    background:#22c55e;
+    color:white;
+}
+
+.rejected{
+    background:#ef4444;
+    color:white;
+}
+
+/* ACTIONS */
+
+.action-buttons{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
+.action-buttons button{
+    flex:1;
+    min-width:100px;
+    border:none;
+    padding:10px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    color:white;
+}
+
+.btn-approve{
+    background:#22c55e;
+}
+
+.btn-edit{
+    background:#0ea5e9;
+}
+
+.btn-delete{
+    background:#ef4444;
+}
+
+/* EMPTY */
+
+.empty-state{
+    text-align:center;
+    padding:50px;
+    color:#94a3b8;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    .dashboard-container{
+        margin:20px;
+        padding:0;
+    }
+
+    .action-buttons{
+        flex-direction:column;
+    }
+
+}
+
 </style>
+
 </head>
+
 <body>
 
+<!-- NAVBAR -->
 <div class="navbar">
-    <div class="logo">⛪ SDA Admin</div>
+
+    <div class="logo">
+        ⛪ SDA Admin
+    </div>
+
     <div class="nav-links">
-        <a href="admin-dashboard.html">Home</a>
-        <a href="#" onclick="logoutAdmin()">Logout</a>
+
+        <a href="index.html">
+            Home
+        </a>
+
+        <a href="#"
+        onclick="logoutAdmin()">
+
+            Logout
+
+        </a>
+
     </div>
+
 </div>
 
-<div class="container">
-    <h2>👨‍💼 Church Admin Dashboard</h2>
+<!-- DASHBOARD -->
+<div class="dashboard-container">
 
-    <div id="stats" style="display:grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap:15px; margin-bottom:25px;">
-        <div class="card">
-            <h3 id="totalMembers">0</h3>
-            <p>Total Members</p>
+    <h1 style="
+    text-align:center;
+    margin-bottom:30px;">
+
+        👨‍💼 Church Administration Dashboard
+
+    </h1>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+
+        <div class="stats-card">
+
+            <h2 id="totalMembers">
+                0
+            </h2>
+
+            <p>
+                Total Members
+            </p>
+
         </div>
-        <div class="card">
-            <h3 id="pendingMembers">0</h3>
-            <p>Pending</p>
+
+        <div class="stats-card">
+
+            <h2 id="pendingMembers">
+                0
+            </h2>
+
+            <p>
+                Pending Requests
+            </p>
+
         </div>
-        <div class="card">
-            <h3 id="approvedMembers">0</h3>
-            <p>Approved</p>
+
+        <div class="stats-card">
+
+            <h2 id="approvedMembers">
+                0
+            </h2>
+
+            <p>
+                Approved Members
+            </p>
+
         </div>
+
     </div>
 
-    <div class="input-box">
-        <input type="text" id="searchInput" placeholder="Search member by name..." onkeyup="filterMembers()">
+    <!-- SEARCH -->
+    <div class="search-box">
+
+        <input
+        type="text"
+        id="searchInput"
+        placeholder=
+        "🔎 Search member by name..."
+        onkeyup="filterMembers()">
+
     </div>
 
+    <!-- TOGGLE -->
     <div class="toggle-container">
-        <button id="viewAllBtn" class="view-btn" style="background: #475569;" onclick="changeDashboardView('all')">
-            👥 All Requests Queue
+
+        <button
+        id="viewAllBtn"
+        class="view-btn active-view"
+        onclick="changeDashboardView('all')">
+
+            👥 All Members
+
         </button>
-        <button id="viewApprovedBtn" class="view-btn" style="background: #1e293b; border: 1px solid rgba(255,255,255,0.1); color: #94a3b8;" onclick="changeDashboardView('approved')">
-            📋 View Approved Roster
+
+        <button
+        id="viewApprovedBtn"
+        class="view-btn inactive-view"
+        onclick="changeDashboardView('approved')">
+
+            ✅ Approved Members
+
         </button>
+
     </div>
 
-    <div id="membersList"></div>
+    <!-- MEMBERS -->
+    <div
+    id="membersList"
+    class="member-grid">
+
+    </div>
+
+    <!-- EMPTY -->
+    <div
+    id="emptyState"
+    class="empty-state"
+    style="display:none;">
+
+        No members found.
+
+    </div>
+
 </div>
 
-<script type="module" src="js/dashboard.js"></script>
+<!-- DASHBOARD JS -->
+<script type="module"
+src="js/dashboard.js"></script>
+
 </body>
 </html>
