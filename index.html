@@ -5,6 +5,101 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Naigobya SDA Church Membership System</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Injected layout refinements to natively support expanded spiritual content cards */
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: white;
+    }
+    .navbar {
+        background: #111827;
+        padding: 15px 8%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .logo {
+        font-size: 20px;
+        font-weight: bold;
+        color: #22c55e;
+    }
+    .nav-links a {
+        color: white;
+        margin-left: 20px;
+        text-decoration: none;
+        font-size: 16px;
+        transition: 0.3s;
+    }
+    .nav-links a:hover { color: #22c55e; }
+    
+    .hero {
+        padding: 80px 8%;
+        text-align: center;
+        background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+    }
+    .hero h1 { font-size: 2.5rem; margin-bottom: 20px; color: white; }
+    .hero p { max-width: 800px; margin: 0 auto 30px auto; color: #94a3b8; line-height: 1.6; }
+    .hero-buttons { display: flex; justify-content: center; gap: 15px; }
+    
+    .btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+    .btn.green { background: #22c55e; color: white; }
+    .btn.dark { background: #1e293b; color: white; border: 1px solid #334155; }
+    .btn:hover { opacity: 0.9; }
+
+    .features, .promises-grid, .prophecy-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        padding: 20px 8% 40px 8%;
+    }
+    .card, .promise-card, .prophecy-card {
+        background: #1e293b;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        border-left: 4px solid #22c55e;
+    }
+    .card h2, .promise-card h3, .prophecy-card h3 { margin-top: 0; color: #22c55e; font-size: 1.25rem; }
+    .card p, .promise-card p, .prophecy-card p { color: #cbd5e1; font-size: 0.9rem; line-height: 1.5; margin-bottom: 0; }
+
+    .about {
+        padding: 50px 8%;
+        max-width: 900px;
+        margin: 0 auto;
+        text-align: center;
+    }
+    .about h2 { color: #22c55e; font-size: 1.8rem; margin-bottom: 15px; }
+    .about p { color: #cbd5e1; line-height: 1.6; }
+    
+    .scripture-highlight {
+        background: #111827;
+        border: 1px dashed #334155;
+        border-radius: 12px;
+        padding: 30px;
+        margin: 40px 8%;
+        text-align: center;
+    }
+    .scripture-highlight p { font-style: italic; color: #e2e8f0; font-size: 1.1rem; margin-bottom: 10px; }
+    .scripture-highlight span { color: #22c55e; font-weight: bold; font-size: 0.9rem; }
+
+    footer {
+        background: #111827;
+        padding: 30px 8%;
+        text-align: center;
+        border-top: 1px solid #1e293b;
+        font-size: 0.9rem;
+        color: #94a3b8;
+    }
+    footer p { margin: 5px 0; }
+  </style>
 </head>
 <body>
 
@@ -26,11 +121,11 @@
       <p>
         Welcome to the official digital membership platform of Naigobya Seventh-day Adventist Church. 
         A Christ-centered system designed to strengthen church organization, unity, accountability, 
-        and spiritual growth through technology.
+        and spiritual growth through technology as we await the Blessed Hope.
       </p>
       <div class="hero-buttons">
         <a href="register.html" class="btn green">Join The Church</a>
-        <a href="church-members.html" class="btn dark">Church Members</a>
+        <a href="church-members.html" class="btn dark">Church Members Portal</a>
       </div>
     </div>
   </section>
@@ -39,50 +134,114 @@
     <div class="card">
       <h2>🙏 Faith & Fellowship</h2>
       <p>
-        Building a united church family through spiritual connection, love, and service 
-        to God and humanity.
+        Building a united church family through deep spiritual connection, earnest prayer, brotherly love, and active service 
+        to God and the Naigobya community.
       </p>
     </div>
 
     <div class="card">
       <h2>👨‍💼 Church Leadership</h2>
       <p>
-        Elders and church leaders manage registrations, approvals, and member 
-        organization responsibly and securely.
+        Elders, pastors, and church department leaders manage registrations, records, and member 
+        organization responsibly, transparently, and securely.
       </p>
     </div>
 
     <div class="card">
       <h2>📖 Mission & Evangelism</h2>
       <p>
-        Supporting the SDA mission of spreading the everlasting gospel to all people 
+        Supporting the global SDA mission of spreading the everlasting gospel to all people, kindred, tongue, and nation 
         through modern digital innovation.
       </p>
     </div>
   </section>
 
   <section class="about">
+    <h2>📋 Our Sacred Baptismal Covenant</h2>
+    <p>
+      When entering into fellowship at Naigobya SDA Church, members declare their faith and alignment with the global 
+      body of Christ through these sacred vows and spiritual promises:
+    </p>
+  </section>
+
+  <section class="promises-grid">
+    <div class="promise-card">
+      <h3>1. The Godhead</h3>
+      <p>We accept Jesus Christ as our personal Savior and Lord, believing in God the Father, the Holy Spirit, and the gift of divine grace through the cross.</p>
+    </div>
+    <div class="promise-card">
+      <h3>2. Authority of Scripture</h3>
+      <p>We accept the Holy Scriptures of the Old and New Testaments as the inspired Word of God and the ultimate, sole rule of faith and practice.</p>
+    </div>
+    <div class="promise-card">
+      <h3>3. Cleansing & New Birth</h3>
+      <p>We accept death to old sinful practices, receiving water baptism by full immersion as a public demonstration of washing and new life in Jesus Christ.</p>
+    </div>
+    <div class="promise-card">
+      <h3>4. The Ten Commandments</h3>
+      <p>We declare our intent to look to God's moral law as a reflection of His character, choosing by His grace to live an obedient, holy life.</p>
+    </div>
+    <div class="promise-card">
+      <h3>5. The Holy Seventh-Day Sabbath</h3>
+      <p>We pledge to observe the Seventh-day Sabbath (Saturday) from sunset Friday to sunset Saturday as the memorial of Creation and a sign of our loyalty to God.</p>
+    </div>
+    <div class="promise-card">
+      <h3>6. The Prophetic Church</h3>
+      <p>We acknowledge the Remnant Church of Bible prophecy and accept the Spirit of Prophecy (manifested in the ministry of Ellen G. White) as a historical gift to God's end-time people.</p>
+    </div>
+    <div class="promise-card">
+      <h3>7. Christian Stewardship</h3>
+      <p>We support the local work of the church through regular worship, systematic benevolence (returning a faithful tithe of 10% and giving free-will offerings), and spiritual dedication.</p>
+    </div>
+    <div class="promise-card">
+      <h3>8. Temple of the Holy Spirit</h3>
+      <p>We promise to respect our bodies as holy temples by abstaining from harmful substances, unclean foods, worldly entertainment, and immodest display.</p>
+    </div>
+  </section>
+
+  <section class="about" style="padding-top: 20px;">
+    <h2>📣 The Three Angels' Messages</h2>
+    <p>Our distinct prophetic identity is anchored in the final proclamation of God's warning and love to a dying world:</p>
+  </section>
+
+  <section class="prophecy-grid">
+    <div class="prophecy-card" style="border-left-color: #f59e0b;">
+      <h3>The First Angel</h3>
+      <p><strong>"Fear God, and give glory to him; for the hour of his judgment is come..."</strong> Calling humanity to return to true worship and honor God as the Creator of heaven and earth.</p>
+    </div>
+    <div class="prophecy-card" style="border-left-color: #3b82f6;">
+      <h3>The Second Angel</h3>
+      <p><strong>"Babylon is fallen, is fallen..."</strong> A message warning against spiritual confusion, false systems of worship, and compromised religious structures that fall away from biblical truth.</p>
+    </div>
+    <div class="prophecy-card" style="border-left-color: #ef4444;">
+      <h3>The Third Angel</h3>
+      <p><strong>"Here is the patience of the saints..."</strong> A warning against receiving the mark of the beast, highlighting the final, faithful remnant who keep the commandments of God and have the faith of Jesus.</p>
+    </div>
+  </section>
+
+  <section class="about">
     <h2>Our SDA Commitment</h2>
     <p>
-      As Seventh-day Adventists, we believe in salvation through Jesus Christ, obedience 
-      to God's commandments, and preparation for the second coming of Christ. 
-      This platform supports church ministry, membership care, organization, and unity 
+      As Seventh-day Adventists, we believe in salvation through grace alone, righteousness by faith in Jesus Christ, obedience 
+      to God's timeless commandments, and preparation for the soon, literal, audible second coming of Christ in the clouds of heaven. 
+      This platform directly supports church ministry, pastoral oversight, membership care, organization, and spiritual unity 
       within the body of Christ.
     </p>
   </section>
 
-  <section class="about" style="padding-top: 0;">
-    <h2>📖 Matthew 28:19-20</h2>
-    <p>
-      “Go ye therefore, and teach all nations, baptizing them in the name of the Father, 
-      and of the Son, and of the Holy Ghost: Teaching them to observe all things 
-      whatsoever I have commanded you.”
-    </p>
-  </section>
+  <div class="scripture-highlight">
+    <p>“Go ye therefore, and teach all nations, baptizing them in the name of the Father, and of the Son, and of the Holy Ghost: Teaching them to observe all things whatsoever I have commanded you: and, lo, I am with you alway, even unto the end of the world. Amen.”</p>
+    <span>— Matthew 28:19-20 (The Great Commission)</span>
+  </div>
+
+  <div class="scripture-highlight" style="margin-top: 0;">
+    <p>“Remember the sabbath day, to keep it holy. Six days shalt thou labour, and do all thy work: But the seventh day is the sabbath of the Lord thy God: in it thou shalt not do any work...”</p>
+    <span>— Exodus 20:8-10</span>
+  </div>
 
   <footer>
     <p>© 2026 Naigobya Seventh-day Adventist Church</p>
-    <p>Built with faith, vision, and technology 💻</p>
+    <p>Built with faith, prophecy, vision, and technology 💻</p>
   </footer>
 
 </body>
