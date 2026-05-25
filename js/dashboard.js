@@ -1,7 +1,8 @@
 // js/dashboard.js
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-import { collection, onSnapshot, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+// Added deleteDoc to the Firestore imports line below
+import { collection, onSnapshot, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
 const LOGGED_ADMIN_EMAIL = "nicholasbagenda@gmail.com";
 let deactivateSnapshotStream = null;
@@ -153,7 +154,8 @@ function renderDashboardInterface() {
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 8px; justify-content: center; min-width: 150px;">
                     <button onclick="window.location.href='church-members.html?uid=${uniqueProfileId}'" style="background:#0284c7; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600; font-size:0.85rem;">✏️ Edit Member Details</button>
-                    <button onclick="rejectMember('${uniqueProfileId}')" style="background:#dc2626; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600; font-size:0.85rem;">❌ Revoke Status</button>
+                    <button onclick="rejectMember('${uniqueProfileId}')" style="background:#ea580c; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600; font-size:0.85rem;">❌ Revoke Status</button>
+                    <button onclick="deleteMember('${uniqueProfileId}', '${memberName}')" style="background:#dc2626; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600; font-size:0.85rem;">🗑️ Delete Member</button>
                 </div>
             `;
         } else {
@@ -172,9 +174,10 @@ function renderDashboardInterface() {
                     <button onclick="window.location.href='church-members.html?uid=${uniqueProfileId}'" style="background:#0284c7; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-weight:600; width:85%;">✏️ Edit Member Details</button>
                 </div>
 
-                <div style="display: flex; gap: 10px; justify-content: center;">
-                    <button onclick="approveMember('${uniqueProfileId}')" style="background:#16a34a; color:white; border:none; padding:8px 14px; border-radius:4px; cursor:pointer; font-weight:600;">✅ Approve</button>
-                    <button onclick="rejectMember('${uniqueProfileId}')" style="background:#dc2626; color:white; border:none; padding:8px 14px; border-radius:4px; cursor:pointer; font-weight:600;">❌ Reject</button>
+                <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="approveMember('${uniqueProfileId}')" style="background:#16a34a; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; font-weight:600; font-size:0.85rem;">✅ Approve</button>
+                    <button onclick="rejectMember('${uniqueProfileId}')" style="background:#ea580c; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; font-weight:600; font-size:0.85rem;">❌ Reject</button>
+                    <button onclick="deleteMember('${uniqueProfileId}', '${memberName}')" style="background:#dc2626; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; font-weight:600; font-size:0.85rem;">🗑️ Delete</button>
                 </div>
             `;
         }
@@ -211,6 +214,26 @@ window.rejectMember = async function (targetDocumentId) {
     try {
         await updateDoc(doc(db, "members", targetDocumentId), { status: "rejected" });
     } catch (e) { displayUIMessage(`Rejection failed: ${e.message}`, true); }
+};
+
+// EXPOSED GLOBAL DELETE CONTROLLER
+window.deleteMember = async function (targetDocumentId, memberName) {
+    // A. Trigger confirmation modal overlay block to prevent accidental screen click triggers
+    const verifyUserIntent = confirm(`🚨 PERMANENT REMOVAL WARNING:\n\nAre you sure you want to completely erase the record for "${memberName}"?\nThis action cannot be undone.`);
+    
+    if (!verifyUserIntent) return;
+
+    try {
+        displayUIMessage(`⏳ Executing drop command for member: ${memberName}...`, false);
+        
+        // B. Run targeted structural clear against Firestore matching Document ID reference
+        await deleteDoc(doc(db, "members", targetDocumentId));
+        
+        displayUIMessage(`✅ Member record "${memberName}" deleted completely from collection database.`, false);
+    } catch (err) {
+        console.error("Critical crash inside deletion processing cycle:", err);
+        displayUIMessage(`🗑️ Deletion transaction aborted: ${err.message}`, true);
+    }
 };
 
 // 4. CLIENT SIDE INTERACTIVE TEXT SEARCH BRIDGE
