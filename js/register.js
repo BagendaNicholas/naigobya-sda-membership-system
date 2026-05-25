@@ -22,7 +22,7 @@ window.registerUser = async function () {
   const pastor = document.getElementById("pastor").value.trim();
   const dobaptism = document.getElementById("dobaptism").value;
   
-  // Grab the compressed image string managed by the canvas compression script
+  // Grabs the optimized image string converted instantly in the background by register.html
   const photoBase64String = document.getElementById("photoBase64String").value;
   const loading = document.getElementById("loading");
 
@@ -34,7 +34,7 @@ window.registerUser = async function () {
 
   // Mandatory photo requirement check
   if (!photoBase64String) {
-    alert("⚠️ Please select a profile photo before submitting registration.");
+    alert("⚠️ Please select a profile photo. Wait a split second for automatic optimization if needed.");
     return;
   }
 
@@ -53,7 +53,7 @@ window.registerUser = async function () {
     const user = userCred.user;
 
     // 5. WRITE RECORD DIRECTLY INTO CLOUD FIRESTORE
-    // Bundles all 10 fields cleanly into the database document path safely below the 1MB limit
+    // Pushes all fields along with the small, optimized background-converted base64 payload
     await setDoc(doc(db, "members", user.uid), {
       uid: user.uid,
       name: name,
@@ -69,7 +69,7 @@ window.registerUser = async function () {
       area: area,
       pastor: pastor,
       dobaptism: dobaptism,
-      photoURL: photoBase64String, // Saves the compressed canvas image payload safely
+      photoURL: photoBase64String, // Saves the compressed, Firestore-safe image text string (~40-80KB)
       status: "pending",
       role: "member",
       createdAt: new Date().toISOString()
@@ -77,7 +77,7 @@ window.registerUser = async function () {
 
     alert("✅ Member Registration Completed Successfully!");
 
-    // 6. REDIRECT DIRECTLY TO THE INDEX HOME PAGE
+    // 6. REDIRECT DIRECTLY TO THE HOME PAGE
     window.location.href = "index.html";
 
   } catch (error) {
