@@ -207,9 +207,9 @@ const base64HiddenInput = document.getElementById("photoBase64String");
 photoInput.addEventListener("change", function(){
     const file = this.files[0];
     if (file) {
-        // Enforce the 1MB size cap right here on the client interface to protect Firestore limits
+        // Updated limit check to accept images up to 3MB seamlessly (3 * 1024 * 1024 bytes)
         if (file.size > 3 * 1024 * 1024) { 
-            alert("⚠️ To keep registrations free, please choose an image smaller than 3MB.");
+            alert("⚠️ The chosen photo is too large! Please choose an image smaller than 3MB.");
             this.value = "";
             previewImage.style.display = "none";
             base64HiddenInput.value = "";
