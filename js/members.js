@@ -45,7 +45,7 @@ onAuthStateChanged(auth, async (activeUser) => {
     }
 });
 
-// 2. RETRIEVE DATA FROM FIRESTORE AND POPULATE FIELDS
+// 2. RETRIEVE DATA FROM FIRESTORE AND POPULATE FIELDS (UPGRADED WITH ALL 10 FIELDS)
 async function loadMemberProfileData(uid) {
     try {
         const memberDocRef = doc(db, "members", uid);
@@ -63,15 +63,19 @@ async function loadMemberProfileData(uid) {
         if (document.getElementById("welcomeName")) {
             document.getElementById("welcomeName").innerText = memberData.name || "Church Member";
         }
-        if (document.getElementById("memberName")) {
-            document.getElementById("memberName").value = memberData.name || "";
-        }
-        if (document.getElementById("memberPhone")) {
-            document.getElementById("memberPhone").value = memberData.phone || "";
-        }
-        if (document.getElementById("memberVillage")) {
-            document.getElementById("memberVillage").value = memberData.address || memberData.village || "";
-        }
+        
+        // 10 Fields Pre-fill Map Engine
+        if (document.getElementById("memberName")) document.getElementById("memberName").value = memberData.name || "";
+        if (document.getElementById("memberDob")) document.getElementById("memberDob").value = memberData.dob || "";
+        if (document.getElementById("memberPhone")) document.getElementById("memberPhone").value = memberData.phone || "";
+        if (document.getElementById("memberVillage")) document.getElementById("memberVillage").value = memberData.village || memberData.address || "";
+        if (document.getElementById("memberCounty")) document.getElementById("memberCounty").value = memberData.county || "";
+        if (document.getElementById("memberDistrict")) document.getElementById("memberDistrict").value = memberData.district || "";
+        if (document.getElementById("memberCountry")) document.getElementById("memberCountry").value = memberData.country || "Uganda";
+        if (document.getElementById("memberChurch")) document.getElementById("memberChurch").value = memberData.church || "";
+        if (document.getElementById("memberArea")) document.getElementById("memberArea").value = memberData.area || "";
+        if (document.getElementById("memberPastor")) document.getElementById("memberPastor").value = memberData.pastor || "";
+        if (document.getElementById("memberDobaptism")) document.getElementById("memberDobaptism").value = memberData.dobaptism || "";
 
         // Handle Status Badges cleanly
         const statusBox = document.getElementById("accountStatus");
@@ -82,14 +86,12 @@ async function loadMemberProfileData(uid) {
         }
 
         // Map Base64 avatar strings or apply fallback initials generator if missing
-        const avatarImageElement = document.getElementById("displayAvatar") || document.getElementById("previewImage");
+        const avatarImageElement = document.getElementById("displayAvatar");
         if (avatarImageElement) {
             if (memberData.photoURL) {
                 avatarImageElement.src = memberData.photoURL;
-                avatarImageElement.style.display = "block"; // Make sure it's visible
             } else {
                 avatarImageElement.src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(memberData.name || 'Member')}`;
-                avatarImageElement.style.display = "block";
             }
         }
 
@@ -100,27 +102,26 @@ async function loadMemberProfileData(uid) {
 }
 
 // 3. LISTEN FOR RE-UPLOADED IMAGE PROFILE CHANGES
-const fileSelectorInput = document.getElementById("updatePhoto") || document.getElementById("photo");
+const fileSelectorInput = document.getElementById("updatePhoto");
 if (fileSelectorInput) {
     fileSelectorInput.addEventListener("change", function () {
         const selectedFile = this.files[0];
         if (selectedFile) {
-            if (selectedFile.size > 1024 * 1024) { 
-                alert("⚠️ Image size is too large. Please keep photo selections under 1MB to preserve storage space.");
+            // Mirroring the updated registration file size cap of 3MB
+            if (selectedFile.size > 3 * 1024 * 1024) { 
+                alert("⚠️ Image size is too large. Please keep photo selections under 3MB.");
                 this.value = "";
                 return;
             }
 
             const imgReader = new FileReader();
             imgReader.onload = function (event) {
-                const imgDisplay = document.getElementById("displayAvatar") || document.getElementById("previewImage");
+                const imgDisplay = document.getElementById("displayAvatar");
                 if (imgDisplay) {
                     imgDisplay.src = event.target.result;
-                    imgDisplay.style.display = "block";
                 }
                 
-                // Save string inside data bucket input fields
-                const rawStringBox = document.getElementById("updatePhotoBase64") || document.getElementById("photoBase64String");
+                const rawStringBox = document.getElementById("updatePhotoBase64");
                 if (rawStringBox) rawStringBox.value = event.target.result;
             };
             imgReader.readAsDataURL(selectedFile);
@@ -128,7 +129,7 @@ if (fileSelectorInput) {
     });
 }
 
-// 4. TRANSACTION PROFILE WRITE AND UPDATE HANDLER ENGINE
+// 4. TRANSACTION PROFILE WRITE AND UPDATE HANDLER ENGINE (UPGRADED WITH ALL 10 FIELDS)
 const saveBtn = document.getElementById("saveProfileBtn");
 if (saveBtn) {
     saveBtn.addEventListener("click", async () => {
@@ -137,30 +138,50 @@ if (saveBtn) {
             return;
         }
 
+        // Extracting all the updated input variants from the interactive UI layout
         const nameField = document.getElementById("memberName").value.trim();
+        const dobField = document.getElementById("memberDob").value;
         const phoneField = document.getElementById("memberPhone").value.trim();
         const villageField = document.getElementById("memberVillage").value.trim();
+        const countyField = document.getElementById("memberCounty").value.trim();
+        const districtField = document.getElementById("memberDistrict").value.trim();
+        const countryField = document.getElementById("memberCountry").value.trim();
+        const churchField = document.getElementById("memberChurch").value.trim();
+        const areaField = document.getElementById("memberArea").value.trim();
+        const pastorField = document.getElementById("memberPastor").value.trim();
+        const dobaptismField = document.getElementById("memberDobaptism").value;
         
-        const photoStringInput = document.getElementById("updatePhotoBase64") || document.getElementById("photoBase64String");
+        const photoStringInput = document.getElementById("updatePhotoBase64");
         const base64PhotoData = photoStringInput ? photoStringInput.value : "";
         
-        const loader = document.getElementById("loadingOverlay") || document.getElementById("loading");
+        const loader = document.getElementById("loadingOverlay");
 
-        if (!nameField || !phoneField || !villageField) {
-            alert("⚠️ Modification Denied: All text descriptor fields must remain populated.");
+        // Validation rule validation checks (Ensuring structural inputs are not blank)
+        if (!nameField || !dobField || !phoneField || !villageField || !countyField || !districtField || !countryField || !churchField || !areaField || !pastorField || !dobaptismField) {
+            alert("⚠️ Modification Denied: All profile data fields must remain fully populated.");
             return;
         }
 
         try {
             if (loader) loader.style.display = "block";
 
+            // Structuring the final write payload mapping object
             const updateFieldsPayload = {
                 name: nameField,
+                dob: dobField,
                 phone: phoneField,
-                address: villageField
+                village: villageField,
+                address: villageField, // Fallback legacy alignment hook
+                county: countyField,
+                district: districtField,
+                country: countryField,
+                church: churchField,
+                area: areaField,
+                pastor: pastorField,
+                dobaptism: dobaptismField
             };
 
-            // Include the profile photo text string if updated
+            // Include the profile photo text string if a new one was uploaded
             if (base64PhotoData) {
                 updateFieldsPayload.photoURL = base64PhotoData;
             }
