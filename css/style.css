@@ -1,11 +1,12 @@
-/* RESET */
+/* ==========================================================================
+   1. GLOBAL SYSTEM RESET & VARIABLES
+   ========================================================================== */
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
 }
 
-/* BODY */
 body{
   font-family:Arial,sans-serif;
   background:#0f172a;
@@ -13,7 +14,9 @@ body{
   min-height:100vh;
 }
 
-/* NAVBAR */
+/* ==========================================================================
+   2. SITE CORE NAVIGATION ELEMENT
+   ========================================================================== */
 .navbar{
   display:flex;
   justify-content:space-between;
@@ -50,7 +53,9 @@ body{
   color:#22c55e;
 }
 
-/* HERO */
+/* ==========================================================================
+   3. LANDING HERO INITIATION BANNER
+   ========================================================================== */
 .hero{
   min-height:90vh;
   display:flex;
@@ -83,7 +88,9 @@ body{
   color:#cbd5e1;
 }
 
-/* BUTTONS */
+/* ==========================================================================
+   4. INTERACTIVE GLOBAL CONTROLS BUTTONS
+   ========================================================================== */
 .hero-buttons{
   display:flex;
   justify-content:center;
@@ -131,14 +138,15 @@ button:hover{
   opacity:0.9;
 }
 
-/* CONTAINER */
+/* ==========================================================================
+   5. HOUSING BLOCK CONTAINER FRAMEWORKS
+   ========================================================================== */
 .container{
   max-width:1100px;
   margin:40px auto;
   padding:20px;
 }
 
-/* FORM CONTAINER */
 .form-container{
   max-width:500px;
   margin:auto;
@@ -148,9 +156,19 @@ button:hover{
   box-shadow:0 0 20px rgba(0,0,0,0.4);
 }
 
-/* INPUTS */
+/* ==========================================================================
+   6. EXPANDED INPUT FORM LAYOUT ARCHITECTURE
+   ========================================================================== */
 .input-box{
   margin-bottom:15px;
+}
+
+.input-box label{
+  display:block;
+  color:#cbd5e1;
+  font-size:0.85rem;
+  margin-bottom:6px;
+  font-weight:600;
 }
 
 .input-box input,
@@ -170,7 +188,19 @@ textarea{
   color:#94a3b8;
 }
 
-/* FILE INPUT */
+/* SECTION HEADERS FOR MULTI-FIELD FORMS */
+.section-title {
+  color: #22c55e;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 25px 0 15px 0;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* FILE BLOCKS */
 .file-box{
   margin:15px 0;
 }
@@ -179,7 +209,6 @@ textarea{
   color:white;
 }
 
-/* PREVIEW IMAGE */
 .preview{
   text-align:center;
   margin:15px 0;
@@ -194,7 +223,9 @@ textarea{
   display:none;
 }
 
-/* FEATURES */
+/* ==========================================================================
+   7. GRID COMPONENT DISPLAY SYSTEMS
+   ========================================================================== */
 .features{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -202,7 +233,6 @@ textarea{
   padding:70px 8%;
 }
 
-/* CARDS */
 .card{
   background:#1e293b;
   padding:25px;
@@ -226,16 +256,24 @@ textarea{
   line-height:1.6;
 }
 
-/* MEMBER GRID */
+/* CHURCH ADMIN LIVE PROFILE CARDS */
 .members-grid{
   display:grid;
-  grid-template-columns:
-  repeat(auto-fit,minmax(280px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
   gap:20px;
   margin-top:20px;
 }
 
-/* MEMBER PHOTO */
+/* Injecting structural reinforcement for dynamic injection blocks */
+.member-profile-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+.member-profile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
 .member-photo{
   width:100px;
   height:100px;
@@ -245,7 +283,9 @@ textarea{
   margin-bottom:15px;
 }
 
-/* STATUS */
+/* ==========================================================================
+   8. COMPONENT METRIC BADGES & FEEDBACK STATES
+   ========================================================================== */
 .status-approved{
   color:#22c55e;
   font-weight:bold;
@@ -261,11 +301,9 @@ textarea{
   font-weight:bold;
 }
 
-/* STATS */
 .stats-grid{
   display:grid;
-  grid-template-columns:
-  repeat(auto-fit,minmax(180px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap:20px;
   margin-bottom:30px;
 }
@@ -282,7 +320,6 @@ textarea{
   color:#22c55e;
 }
 
-/* SEARCH */
 .search-box{
   margin:20px 0;
 }
@@ -297,16 +334,18 @@ textarea{
   outline:none;
 }
 
-/* LOADING */
 #loading{
   display:none;
   text-align:center;
   margin-top:15px;
   color:#22c55e;
   font-size:15px;
+  font-weight:bold;
 }
 
-/* ABOUT */
+/* ==========================================================================
+   9. INFORMATION SHOWCASE SECTIONS & FOOTER
+   ========================================================================== */
 .about{
   padding:70px 8%;
   text-align:center;
@@ -325,7 +364,6 @@ textarea{
   color:#cbd5e1;
 }
 
-/* FOOTER */
 footer{
   background:#111827;
   text-align:center;
@@ -338,7 +376,9 @@ footer p{
   color:#94a3b8;
 }
 
-/* MOBILE */
+/* ==========================================================================
+   10. MEDIA QUERY MEDIA RESPONSIVE FLUIDITY
+   ========================================================================== */
 @media(max-width:768px){
 
   .navbar{
@@ -375,5 +415,4 @@ footer p{
   button{
     width:100%;
   }
-
 }
