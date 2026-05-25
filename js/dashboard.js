@@ -1,7 +1,6 @@
 // js/dashboard.js
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-// Added deleteDoc to the Firestore imports line below
 import { collection, onSnapshot, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
 const LOGGED_ADMIN_EMAIL = "nicholasbagenda@gmail.com";
@@ -102,18 +101,30 @@ function renderDashboardInterface() {
         targetedDisplayData = cachedMembersArray.filter(member => member.status === "approved");
     }
 
-    // B. Apply Text Search Query Ruleset
+    // B. Apply Text Search Query Ruleset (UPGRADED WITH ALL 10 FIELDS)
     if (rawSearchInputValue) {
         targetedDisplayData = targetedDisplayData.filter(member => {
             const name = (member.name || "").toLowerCase();
             const email = (member.email || "").toLowerCase();
             const phone = (member.phone || "");
-            const village = (member.address || member.village || "").toLowerCase();
+            const village = (member.village || member.address || "").toLowerCase();
+            const county = (member.county || "").toLowerCase();
+            const district = (member.district || "").toLowerCase();
+            const country = (member.country || "").toLowerCase();
+            const church = (member.church || "").toLowerCase();
+            const pastor = (member.pastor || "").toLowerCase();
+            const area = (member.area || "").toLowerCase();
             
             return name.includes(rawSearchInputValue) || 
                    email.includes(rawSearchInputValue) || 
                    phone.includes(rawSearchInputValue) || 
-                   village.includes(rawSearchInputValue);
+                   village.includes(rawSearchInputValue) ||
+                   county.includes(rawSearchInputValue) ||
+                   district.includes(rawSearchInputValue) ||
+                   country.includes(rawSearchInputValue) ||
+                   church.includes(rawSearchInputValue) ||
+                   pastor.includes(rawSearchInputValue) ||
+                   area.includes(rawSearchInputValue);
         });
     }
 
@@ -126,9 +137,21 @@ function renderDashboardInterface() {
     targetedDisplayData.forEach((profileData) => {
         const uniqueProfileId = profileData.uniqueProfileId;
         const memberName = profileData.name || "Anonymous Member";
-        const memberVillage = profileData.address || profileData.village || "Not Provided";
+        
+        // Extracting all the 10 data tokens cleanly with fallbacks
+        const memberDob = profileData.dob || "Not Provided";
+        const memberPhone = profileData.phone || "No Contact";
+        const memberEmail = profileData.email || "No Email";
+        const memberVillage = profileData.village || profileData.address || "Not Provided";
+        const memberCounty = profileData.county || "Not Provided";
+        const memberDistrict = profileData.district || "Not Provided";
+        const memberCountry = profileData.country || "Uganda";
+        const memberChurch = profileData.church || "Not Provided";
+        const memberArea = profileData.area || "Not Provided";
+        const memberPastor = profileData.pastor || "Not Provided";
+        const memberBaptismDate = profileData.dobaptism || "Not Provided";
 
-        // FIXED: Safe Image Parsing Engine to read raw Base64 strings correctly
+        // Safe Image Parsing Engine to read raw Base64 strings correctly
         let finalUserImageSrc = "";
         if (profileData.photoURL && profileData.photoURL.trim() !== "") {
             finalUserImageSrc = profileData.photoURL; 
@@ -140,44 +163,63 @@ function renderDashboardInterface() {
         memberCardElement.className = "member-profile-card";
         
         if (currentFilterView === "approved") {
-            // CONDITIONAL VIEW MARGIN: Premium full-row list visualization layout for the Approved Roster
-            memberCardElement.style.cssText = "background: rgba(34, 197, 94, 0.04); padding: 20px; border-radius: 12px; border: 1px solid rgba(34, 197, 94, 0.2); text-align: left; margin-top: 15px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;";
+            // CONDITIONAL VIEW: Full-row list visualization layout for Approved Roster
+            memberCardElement.style.cssText = "background: rgba(34, 197, 94, 0.04); padding: 25px; border-radius: 12px; border: 1px solid rgba(34, 197, 94, 0.2); text-align: left; margin-top: 15px; display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap;";
             memberCardElement.innerHTML = `
                 <img src="${finalUserImageSrc}" 
-                     style="width:75px; height:75px; border-radius:50%; object-fit:cover; border: 2px solid #16a34a;"
+                     style="width:90px; height:90px; border-radius:50%; object-fit:cover; border: 3px solid #16a34a;"
                      onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(memberName)}';">
-                <div style="flex: 1; min-width: 200px;">
-                    <h3 style="margin: 0 0 6px 0; color: #fff; font-size: 1.2rem;">${memberName}</h3>
-                    <p style="margin: 3px 0; font-size: 0.9rem; color: #cbd5e1;">📧 ${profileData.email || "No Email Address"}</p>
-                    <p style="margin: 3px 0; font-size: 0.9rem; color: #cbd5e1;">📞 ${profileData.phone || "No Phone Contact"}</p>
-                    <p style="margin: 6px 0 0 0; font-size: 0.9rem; color: #94a3b8;">📍 Village/District: <b style="color:#fff;">${memberVillage}</b></p>
+                
+                <div style="flex: 2; min-width: 250px;">
+                    <h3 style="margin: 0 0 8px 0; color: #fff; font-size: 1.3rem;">${memberName}</h3>
+                    <p style="margin: 4px 0; font-size: 0.9rem; color: #cbd5e1;">📧 <b>Email:</b> ${memberEmail}</p>
+                    <p style="margin: 4px 0; font-size: 0.9rem; color: #cbd5e1;">📞 <b>Phone:</b> ${memberPhone}</p>
+                    <p style="margin: 4px 0; font-size: 0.9rem; color: #cbd5e1;">📅 <b>D.O.B:</b> ${memberDob}</p>
+                    <p style="margin: 8px 0 0 0; font-size: 0.9rem; color: #94a3b8;">📍 <b>Location:</b> ${memberVillage}, ${memberCounty}, ${memberDistrict}, ${memberCountry}</p>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 8px; justify-content: center; min-width: 150px;">
-                    <button onclick="window.location.href='church-members.html?uid=${uniqueProfileId}'" style="background:#0284c7; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600; font-size:0.85rem;">✏️ Edit Member Details</button>
-                    <button onclick="rejectMember('${uniqueProfileId}')" style="background:#ea580c; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600; font-size:0.85rem;">❌ Revoke Status</button>
-                    <button onclick="deleteMember('${uniqueProfileId}', '${memberName}')" style="background:#dc2626; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600; font-size:0.85rem;">🗑️ Delete Member</button>
+
+                <div style="flex: 2; min-width: 250px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px;">
+                    <h4 style="margin: 0 0 6px 0; color: #22c55e; font-size: 1rem;">⛪ Church Affiliation</h4>
+                    <p style="margin: 4px 0; font-size: 0.9rem; color: #cbd5e1;"><b>Church:</b> ${memberChurch}</p>
+                    <p style="margin: 4px 0; font-size: 0.9rem; color: #cbd5e1;"><b>District/Area:</b> ${memberArea}</p>
+                    <p style="margin: 4px 0; font-size: 0.9rem; color: #cbd5e1;"><b>Pastor:</b> ${memberPastor}</p>
+                    <p style="margin: 4px 0; font-size: 0.9rem; color: #cbd5e1;">🌊 <b>Baptism Date:</b> ${memberBaptismDate}</p>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px; justify-content: center; min-width: 160px; flex: 1;">
+                    <button onclick="window.location.href='church-members.html?uid=${uniqueProfileId}'" style="background:#0284c7; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; font-weight:600; font-size:0.85rem;">✏️ Edit Details</button>
+                    <button onclick="rejectMember('${uniqueProfileId}')" style="background:#ea580c; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; font-weight:600; font-size:0.85rem;">❌ Revoke Status</button>
+                    <button onclick="deleteMember('${uniqueProfileId}', '${memberName}')" style="background:#dc2626; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; font-weight:600; font-size:0.85rem;">🗑️ Delete Member</button>
                 </div>
             `;
         } else {
-            // CONDITIONAL VIEW MARGIN: Original Pending Queue view with operational workflow action paths
-            memberCardElement.style.cssText = "background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: center; margin-top: 15px;";
+            // CONDITIONAL VIEW: Organized Pending Queue grid layout with multi-field readouts
+            memberCardElement.style.cssText = "background: rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: center; margin-top: 15px; display: flex; flex-direction: column; align-items: center;";
             memberCardElement.innerHTML = `
                 <img src="${finalUserImageSrc}" 
-                     style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom: 12px; border: 2px solid #16a34a;"
+                     style="width:85px; height:85px; border-radius:50%; object-fit:cover; margin-bottom: 12px; border: 2px solid #ffaa00;"
                      onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(memberName)}';">
-                <h3 style="margin: 5px 0; color: #fff;">${memberName}</h3>
-                <p style="margin: 4px 0; font-size: 0.9rem; color: #ccc;">${profileData.email || "No Email"}</p>
-                <p style="margin: 4px 0; font-size: 0.9rem; color: #ccc;">${profileData.phone || "No Phone"}</p>
-                <p style="margin: 12px 0; font-size: 0.95rem;">Status: <b style="text-transform: uppercase; color: ${profileData.status === 'approved' ? '#16a34a' : '#ffaa00'}">${profileData.status || "pending"}</b></p>
                 
-                <div style="margin-bottom: 12px;">
-                    <button onclick="window.location.href='church-members.html?uid=${uniqueProfileId}'" style="background:#0284c7; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer; font-weight:600; width:85%;">✏️ Edit Member Details</button>
+                <h3 style="margin: 5px 0; color: #fff; font-size: 1.25rem;">${memberName}</h3>
+                <p style="margin: 3px 0; font-size: 0.9rem; color: #ccc;">📧 ${memberEmail} | 📞 ${memberPhone}</p>
+                <p style="margin: 3px 0; font-size: 0.9rem; color: #94a3b8;">📅 Birth: ${memberDob} | 🌊 Baptism: ${memberBaptismDate}</p>
+                
+                <div style="background: rgba(0,0,0,0.2); width: 100%; padding: 12px; border-radius: 8px; margin: 12px 0; text-align: left; box-sizing: border-box;">
+                    <p style="margin: 3px 0; font-size: 0.85rem; color: #cbd5e1;">📍 <b>Home:</b> ${memberVillage}, ${memberDistrict}</p>
+                    <p style="margin: 3px 0; font-size: 0.85rem; color: #cbd5e1;">⛪ <b>Church:</b> ${memberChurch} (${memberArea})</p>
+                    <p style="margin: 3px 0; font-size: 0.85rem; color: #cbd5e1;">👨‍🌾 <b>Pastor:</b> ${memberPastor}</p>
                 </div>
 
-                <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
-                    <button onclick="approveMember('${uniqueProfileId}')" style="background:#16a34a; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; font-weight:600; font-size:0.85rem;">✅ Approve</button>
-                    <button onclick="rejectMember('${uniqueProfileId}')" style="background:#ea580c; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; font-weight:600; font-size:0.85rem;">❌ Reject</button>
-                    <button onclick="deleteMember('${uniqueProfileId}', '${memberName}')" style="background:#dc2626; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; font-weight:600; font-size:0.85rem;">🗑️ Delete</button>
+                <p style="margin: 0 0 15px 0; font-size: 0.9rem;">Status: <b style="text-transform: uppercase; color: #ffaa00">${profileData.status || "pending"}</b></p>
+                
+                <div style="margin-bottom: 12px; width: 100%;">
+                    <button onclick="window.location.href='church-members.html?uid=${uniqueProfileId}'" style="background:#0284c7; color:white; border:none; padding:10px 16px; border-radius:6px; cursor:pointer; font-weight:600; width:90%;">✏️ Edit Member Details</button>
+                </div>
+
+                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; width: 100%;">
+                    <button class="btn" style="background:#16a34a;" onclick="approveMember('${uniqueProfileId}')">✅ Approve</button>
+                    <button class="btn" style="background:#ea580c;" onclick="rejectMember('${uniqueProfileId}')">❌ Reject</button>
+                    <button class="btn" style="background:#dc2626;" onclick="deleteMember('${uniqueProfileId}', '${memberName}')">🗑️ Delete</button>
                 </div>
             `;
         }
@@ -218,17 +260,13 @@ window.rejectMember = async function (targetDocumentId) {
 
 // EXPOSED GLOBAL DELETE CONTROLLER
 window.deleteMember = async function (targetDocumentId, memberName) {
-    // A. Trigger confirmation modal overlay block to prevent accidental screen click triggers
     const verifyUserIntent = confirm(`🚨 PERMANENT REMOVAL WARNING:\n\nAre you sure you want to completely erase the record for "${memberName}"?\nThis action cannot be undone.`);
     
     if (!verifyUserIntent) return;
 
     try {
         displayUIMessage(`⏳ Executing drop command for member: ${memberName}...`, false);
-        
-        // B. Run targeted structural clear against Firestore matching Document ID reference
         await deleteDoc(doc(db, "members", targetDocumentId));
-        
         displayUIMessage(`✅ Member record "${memberName}" deleted completely from collection database.`, false);
     } catch (err) {
         console.error("Critical crash inside deletion processing cycle:", err);
