@@ -36,8 +36,21 @@ body {
     text-align: center;
     margin-bottom: 25px;
 }
+.section-title {
+    color: #22c55e;
+    font-size: 1.1rem;
+    margin: 25px 0 15px 0;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 5px;
+}
 .input-box {
     margin-bottom: 15px;
+}
+.input-box label {
+    display: block;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
 }
 .input-box input {
     width: 100%;
@@ -113,11 +126,12 @@ button:hover {
     </div>
 
     <div class="input-box">
-        <input type="text" id="phone" placeholder="Phone Number">
+        <label for="dob">Date of Birth</label>
+        <input type="date" id="dob">
     </div>
 
     <div class="input-box">
-        <input type="text" id="village" placeholder="Village / District">
+        <input type="text" id="phone" placeholder="Phone Number">
     </div>
 
     <div class="input-box">
@@ -126,6 +140,43 @@ button:hover {
 
     <div class="input-box">
         <input type="password" id="password" placeholder="Password">
+    </div>
+
+    <div class="section-title">📍 Location Details</div>
+
+    <div class="input-box">
+        <input type="text" id="village" placeholder="Village">
+    </div>
+
+    <div class="input-box">
+        <input type="text" id="county" placeholder="County">
+    </div>
+
+    <div class="input-box">
+        <input type="text" id="district" placeholder="District">
+    </div>
+
+    <div class="input-box">
+        <input type="text" id="country" value="Uganda" placeholder="Country">
+    </div>
+
+    <div class="section-title">⛪ Church Membership</div>
+
+    <div class="input-box">
+        <input type="text" id="church" placeholder="Local Church Name">
+    </div>
+
+    <div class="input-box">
+        <input type="text" id="area" placeholder="Church Area / District Block">
+    </div>
+
+    <div class="input-box">
+        <input type="text" id="pastor" placeholder="Pastor in Charge">
+    </div>
+
+    <div class="input-box">
+        <label for="dobaptism">Date of Baptism</label>
+        <input type="date" id="dobaptism">
     </div>
 
     <div class="file-box">
@@ -156,7 +207,7 @@ const base64HiddenInput = document.getElementById("photoBase64String");
 photoInput.addEventListener("change", function(){
     const file = this.files[0];
     if (file) {
-        // Enforce the 2MB size cap right here on the client interface to protect Firestore limits
+        // Enforce the 1MB size cap right here on the client interface to protect Firestore limits
         if (file.size > 1024 * 1024) { 
             alert("⚠️ To keep registrations free, please choose an image smaller than 1MB.");
             this.value = "";
