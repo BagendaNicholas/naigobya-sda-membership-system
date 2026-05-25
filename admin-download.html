@@ -117,12 +117,14 @@ th {
     padding: 12px;
     font-weight: 600;
     border-bottom: 2px solid #1e293b;
+    white-space: nowrap;
 }
 td {
     padding: 12px;
     border-bottom: 1px solid #1e293b;
     color: #cbd5e1;
     vertical-align: middle;
+    white-space: nowrap;
 }
 .row-avatar {
     width: 40px;
@@ -304,12 +306,10 @@ tr:hover td { background: #1e293b; color: white; }
    📥 HARDWARE PRINTER ENGINE ABSOLUTE OVERRIDES
    ========================================================= */
 @media print {
-    /* Absolute hide for web UI viewports */
     .web-ui-element, .navbar, .panel-container { 
         display: none !important; 
     }
     
-    /* Strict force removal of web controls to prevent empty top page margins */
     .web-only-controls, 
     .no-print-actions, 
     .print-filter-tabs { 
@@ -338,7 +338,6 @@ tr:hover td { background: #1e293b; color: white; }
         color: black !important; 
     }
     
-    /* Force header content to anchor to the exact top edge of page 1 */
     .print-header { 
         display: flex !important; 
         align-items: center !important;
@@ -427,7 +426,7 @@ tr:hover td { background: #1e293b; color: white; }
                             <th>Full Name</th>
                             <th>DOB</th>
                             <th>Phone</th>
-                            <th>Villag
+                            <th>Village</th>
                             <th>District</th>
                             <th>Country</th>
                             <th>Baptism Date</th>
@@ -450,12 +449,12 @@ tr:hover td { background: #1e293b; color: white; }
                         <tr>
                             <th>Photo</th>
                             <th>Full Name</th>
+                            <th>DOB</th>
                             <th>Phone</th>
-                           <th>DOB</th>
                             <th>Village</th>
                             <th>District</th>
                             <th>Country</th>
-                           <th>Pastor</th>
+                            <th>Pastor</th>
                             <th>Registration Date</th>
                         </tr>
                     </thead>
