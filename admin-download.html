@@ -101,11 +101,10 @@ body {
     transition: 0.2s;
 }
 .btn-download:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-print-view { background: #3b82f6; color: white; }
 .btn-pending-dl { background: #f59e0b; color: #0f172a; }
 
-.table-wrapper {
-    overflow-x: auto;
-}
+.table-wrapper { overflow-x: auto; }
 table {
     width: 100%;
     border-collapse: collapse;
@@ -123,6 +122,15 @@ td {
     padding: 12px;
     border-bottom: 1px solid #1e293b;
     color: #cbd5e1;
+    vertical-align: middle;
+}
+.row-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #22c55e;
+    background: #1e293b;
 }
 tr:hover td { background: #1e293b; color: white; }
 
@@ -133,26 +141,108 @@ tr:hover td { background: #1e293b; color: white; }
     padding: 40px;
     font-weight: bold;
 }
+
+/* =========================================================
+   👑 ULTRA-PROFESSIONAL PRINT & EXECUTIVE REPORT ENGINE 
+   ========================================================= */
+#printReportView {
+    display: none;
+    background: white;
+    color: #000;
+    padding: 40px;
+    min-height: 100vh;
+}
+.print-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px double #000;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+.print-title-block { text-align: center; flex-grow: 1; }
+.print-title-block h1 { margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; color: #111; }
+.print-title-block p { margin: 5px 0 0 0; font-size: 14px; color: #444; font-weight: bold; }
+.print-logo { height: 75px; width: auto; }
+
+.printable-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+.printable-table th {
+    background: #f1f5f9 !important;
+    color: #000 !important;
+    border: 1px solid #94a3b8 !important;
+    padding: 10px;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+.printable-table td {
+    color: #000 !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 8px;
+    font-size: 12px;
+}
+.print-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #000;
+    display: block;
+}
+.print-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    border: 1px solid #000;
+}
+
+.no-print-actions {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+    border: 1px solid #cbd5e1;
+}
+
+/* TARGET NATIVE DEVICE PRINT DISPATCH CONFIGURATION */
+@media print {
+    body * { display: none !important; }
+    #printReportView, #printReportView * { display: block !important; }
+    .no-print-actions { display: none !important; }
+    #printReportView { padding: 0; background: white; color: black; }
+    table { display: table !important; width: 100% !important; }
+    tr { display: table-row !important; }
+    th, td { display: table-cell !important; }
+    .print-header { display: flex !important; }
+}
 </style>
 </head>
 <body>
 
-  <nav class="navbar">
+  <div class="web-ui-element navbar">
     <div class="logo-block">
-      <img src="76531.jpg" alt="SDA Logo">
+      <img src="images/76531.jpg" alt="SDA Logo">
       <span>Naigobya SDA</span>
     </div>
     <div class="nav-links">
       <a href="admin-dashboard.html">📊 Dashboard</a>
       <a href="index.html">Home</a>
     </div>
-  </nav>
+  </div>
 
-  <div class="panel-container">
+  <div class="web-ui-element panel-container">
     <div class="panel-header">
       <h2>📋 Member Records Export Panel</h2>
       <div style="display: flex; gap: 10px;">
-         <button class="btn-download" onclick="downloadBothLists()">📥 Download All Combined</button>
+         <button class="btn-download btn-print-view" onclick="activatePrintLayout()">🖨️ View Professional Printable Roster</button>
+         <button class="btn-download" onclick="downloadBothLists()">📥 Download Excel CSV</button>
       </div>
     </div>
 
@@ -165,22 +255,21 @@ tr:hover td { background: #1e293b; color: white; }
         <div class="section-box" style="border-top: 4px solid #22c55e;">
             <div class="section-header">
                 <h3>🟢 Approved Members <span id="approvedCount" class="badge-count count-approved">0</span></h3>
-                <button class="btn-download" onclick="exportList('approved')">💾 Download Approved List</button>
+                <button class="btn-download" onclick="exportList('approved')">💾 Download Approved CSV</button>
             </div>
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
+                            <th>Photo</th>
                             <th>Full Name</th>
                             <th>Phone</th>
                             <th>Village</th>
                             <th>District</th>
-                            <th>Local Church</th>
                             <th>Baptism Date</th>
                         </tr>
                     </thead>
-                    <tbody id="approvedTableBody">
-                        </tbody>
+                    <tbody id="approvedTableBody"></tbody>
                 </table>
             </div>
         </div>
@@ -188,27 +277,58 @@ tr:hover td { background: #1e293b; color: white; }
         <div class="section-box" style="border-top: 4px solid #f59e0b;">
             <div class="section-header">
                 <h3>🟡 Pending Verification <span id="pendingCount" class="badge-count count-pending">0</span></h3>
-                <button class="btn-download btn-pending-dl" onclick="exportList('pending')">💾 Download Pending List</button>
+                <button class="btn-download btn-pending-dl" onclick="exportList('pending')">💾 Download Pending CSV</button>
             </div>
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
+                            <th>Photo</th>
                             <th>Full Name</th>
                             <th>Phone</th>
                             <th>Village</th>
                             <th>District</th>
-                            <th>Local Church</th>
                             <th>Registration Date</th>
                         </tr>
                     </thead>
-                    <tbody id="pendingTableBody">
-                        </tbody>
+                    <tbody id="pendingTableBody"></tbody>
                 </table>
             </div>
         </div>
-
     </div>
+  </div>
+
+  <div id="printReportView">
+      <div class="no-print-actions">
+          <button class="btn-download" onclick="window.print()" style="background:#1e293b;">🖨️ Send to Printer / Save PDF</button>
+          <button class="btn-download" onclick="closePrintLayout()" style="background:#ef4444;">❌ Close Printable Roster</button>
+      </div>
+
+      <div class="print-header">
+          <img src="images/76531.jpg" class="print-logo" alt="SDA Logo">
+          <div class="print-title-block">
+              <h1>Naigobya Seventh-day Adventist Church</h1>
+              <p>Official Congregational Membership Roster & Historical Ledger</p>
+          </div>
+          <img src="images/76531.jpg" class="print-logo" style="opacity:0;" alt="Spacer">
+      </div>
+
+      <h3 style="margin: 20px 0 10px 0; border-bottom: 2px solid #000; padding-bottom: 5px; font-size: 16px;">CONGREGATIONAL MEMBERSHIP LIST</h3>
+      <table class="printable-table">
+          <thead>
+              <tr>
+                  <th style="width: 60px;">Profile</th>
+                  <th>Full Name</th>
+                  <th>Phone Number</th>
+                  <th>Village / Location</th>
+                  <th>District</th>
+                  <th>Local Church</th>
+                  <th>Baptism / Reg Date</th>
+                  <th>Status</th>
+              </tr>
+          </thead>
+          <tbody id="printableMasterRows"></tbody>
+      </table>
   </div>
 
   <script type="module" src="js/admin-download.js"></script>
