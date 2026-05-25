@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (targetFile) {
         // Enforce a 1MB file limit to prevent Firestore document storage overflow crashes
-        if (targetFile.size > 1024 * 1024) {
+        if (targetFile.size > 3 * 1024 * 1024) {
           alert("⚠️ The chosen photo is too large! Please choose an image smaller than 1MB.");
           photoFileInput.value = "";
           return;
@@ -64,8 +64,8 @@ window.registerUser = async function () {
   }
 
   // 2. SECURITY POLICY BOUNDS LENGTH CHECK
-  if (password.length < 6) {
-    alert("⚠️ Password must be at least 6 characters long.");
+  if (password.length < 8) {
+    alert("⚠️ Password must be at least 8 characters long.");
     return;
   }
 
@@ -97,7 +97,7 @@ window.registerUser = async function () {
     globalBase64ImageString = "";
 
     // 5. REDIRECT DIRECTLY TO THE ADMIN INTERFACE PIPELINE
-    window.location.href = "admin-dashboard.html";
+    window.location.href = "index.html";
 
   } catch (error) {
     console.error("Critical failure during core registration process flow:", error);
