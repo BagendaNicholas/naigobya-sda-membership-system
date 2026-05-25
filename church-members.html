@@ -68,6 +68,13 @@ body {
 .status-approved { background: #15803d; color: #dcfce7; }
 .status-rejected { background: #b91c1c; color: #fee2e2; }
 
+.section-title {
+    color: #22c55e;
+    font-size: 1.1rem;
+    margin: 25px 0 15px 0;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 5px;
+}
 .input-box {
     margin-bottom: 15px;
 }
@@ -139,13 +146,57 @@ button.btn-save:hover { opacity: 0.9; }
     </div>
 
     <div class="input-box">
+        <label>Date of Birth</label>
+        <input type="date" id="memberDob">
+    </div>
+
+    <div class="input-box">
         <label>Phone Number</label>
         <input type="text" id="memberPhone">
     </div>
 
+    <div class="section-title">📍 Location Details</div>
+
     <div class="input-box">
-        <label>Village / District</label>
+        <label>Village</label>
         <input type="text" id="memberVillage">
+    </div>
+
+    <div class="input-box">
+        <label>County</label>
+        <input type="text" id="memberCounty">
+    </div>
+
+    <div class="input-box">
+        <label>District</label>
+        <input type="text" id="memberDistrict">
+    </div>
+
+    <div class="input-box">
+        <label>Country</label>
+        <input type="text" id="memberCountry">
+    </div>
+
+    <div class="section-title">⛪ Church Membership</div>
+
+    <div class="input-box">
+        <label>Local Church Name</label>
+        <input type="text" id="memberChurch">
+    </div>
+
+    <div class="input-box">
+        <label>Church Area / District Block</label>
+        <input type="text" id="memberArea">
+    </div>
+
+    <div class="input-box">
+        <label>Pastor in Charge</label>
+        <input type="text" id="memberPastor">
+    </div>
+
+    <div class="input-box">
+        <label>Date of Baptism</label>
+        <input type="date" id="memberDobaptism">
     </div>
 
     <div class="file-box">
@@ -162,6 +213,36 @@ button.btn-save:hover { opacity: 0.9; }
         ⏳ Saving changes to database...
     </div>
 </div>
+
+<script>
+// Live update file selection processing engine with matching 3MB cap
+const updatePhotoInput = document.getElementById("updatePhoto");
+const displayAvatar = document.getElementById("displayAvatar");
+const updatePhotoBase64 = document.getElementById("updatePhotoBase64");
+
+if (updatePhotoInput) {
+    updatePhotoInput.addEventListener("change", function() {
+        const file = this.files[0];
+        if (file) {
+            // Enforce a matching 3MB size cap limit rule parameter criteria
+            if (file.size > 3 * 1024 * 1024) {
+                alert("⚠️ Chosen file size is too large. Please select a photo under 3MB.");
+                this.value = "";
+                updatePhotoBase64.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgString = e.target.result;
+                displayAvatar.src = imgString;
+                updatePhotoBase64.value = imgString;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
+</script>
 
 <script type="module" src="js/members.js"></script>
 </body>
