@@ -7,7 +7,7 @@ const ADMIN_EMAIL = "nicholasbagenda@gmail.com";
 let approvedMembersMemoryCache = [];
 let pendingMembersMemoryCache = [];
 
-// 1. GATEKEEPER SECURITY CHECK
+// 1. SECURITY TIMEOUT ENGINE CHECK
 onAuthStateChanged(auth, async (user) => {
     if (!user || user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
         alert("🔒 Access Denied: This download portal is restricted to the head Church Administrator.");
@@ -17,7 +17,7 @@ onAuthStateChanged(auth, async (user) => {
     await buildChurchLedgerData();
 });
 
-// 2. FETCH AND SORT RECORDS FROM FIRESTORE
+// 2. QUERY RECOVERY CONTROLLER
 async function buildChurchLedgerData() {
     try {
         const querySnapshot = await getDocs(collection(db, "members"));
@@ -26,8 +26,6 @@ async function buildChurchLedgerData() {
 
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            
-            // Build fallback initial generator link if photo URL is missing
             const fallbackAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(data.name || 'Member')}`;
             
             const memberObj = {
@@ -55,20 +53,17 @@ async function buildChurchLedgerData() {
             }
         });
 
-        // Update web counts
         document.getElementById("approvedCount").innerText = approvedMembersMemoryCache.length;
         document.getElementById("pendingCount").innerText = pendingMembersMemoryCache.length;
 
-        // Render interactive data tables
         renderTableRows(approvedMembersMemoryCache, "approvedTableBody");
         renderTableRows(pendingMembersMemoryCache, "pendingTableBody");
 
-        // Turn off loading screen
         document.getElementById("masterLoading").style.display = "none";
         document.getElementById("portalContent").style.display = "block";
 
     } catch (err) {
-        console.error("Failed to read church records roster:", err);
+        console.error("Firestore Read Failure:", err);
         alert("⚠️ Access Error: " + err.message);
     }
 }
@@ -79,7 +74,7 @@ function renderTableRows(dataset, elementId) {
     tableBody.innerHTML = "";
 
     if (dataset.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b; padding:20px;">No records found in this category.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b; padding:20px;">No records found.</td></tr>`;
         return;
     }
 
@@ -97,37 +92,44 @@ function renderTableRows(dataset, elementId) {
     });
 }
 
-// 3. RUN INTERACTIVE PRINTABLE REPORT SHEET GENERATOR
+// 3. GENERATE MOBILE PROFILE PRINT CARD ENTRIES
 window.activatePrintLayout = function() {
-    const printTargetBody = document.getElementById("printableMasterRows");
-    if (!printTargetBody) return;
-    printTargetBody.innerHTML = "";
+    const cardTargetContainer = document.getElementById("printableMasterCards");
+    if (!cardTargetContainer) return;
+    cardTargetContainer.innerHTML = "";
 
     const combinedMasterList = [...approvedMembersMemoryCache, ...pendingMembersMemoryCache];
 
     if (combinedMasterList.length === 0) {
-        printTargetBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px;">No congregation data logged to generate reports.</td></tr>`;
+        cardTargetContainer.innerHTML = `<div style="text-align:center; padding:30px;">No congregation data logged to generate reports.</div>`;
     } else {
         combinedMasterList.forEach(m => {
-            const row = document.createElement("tr");
-            const isApproved = m.status.toLowerCase() === "approved";
-            const statusStyle = isApproved ? "background:#dcfce7; color:#15803d; border-color:#15803d;" : "background:#fef3c7; color:#b45309; border-color:#b45309;";
+            const card = document.createElement("div");
+            card.className = "member-print-card";
             
-            row.innerHTML = `
-                <td style="text-align:center;"><img src="${m.photoURL}" class="print-avatar" alt="Profile"></td>
-                <td><strong>${m.name}</strong><br><span style="font-size:10px; color:#555;">DOB: ${m.dob}</span></td>
-                <td>${m.phone}</td>
-                <td>${m.village}</td>
-                <td>${m.district}</td>
-                <td>${m.church}</td>
-                <td>${isApproved ? m.dobaptism : m.createdAt}</td>
-                <td style="text-align:center;"><span class="print-badge" style="${statusStyle}">${m.status.toUpperCase()}</span></td>
+            const isApproved = m.status.toLowerCase() === "approved";
+            const badgeStyle = isApproved ? "background:#dcfce7; color:#15803d; border-color:#15803d;" : "background:#fef3c7; color:#b45309; border-color:#b45309;";
+            const dateLabel = isApproved ? `Baptized: ${m.dobaptism}` : `Registered: ${m.createdAt}`;
+
+            card.innerHTML = `
+                <img src="${m.photoURL}" class="print-avatar" alt="Profile">
+                <div class="print-card-details">
+                    <h4>${m.name}</h4>
+                    <div class="print-info-grid">
+                        <div><strong>Phone:</strong> ${m.phone}</div>
+                        <div><strong>DOB:</strong> ${m.dob}</div>
+                        <div><strong>Village:</strong> ${m.village}</div>
+                        <div><strong>District:</strong> ${m.district}</div>
+                        <div><strong>Church:</strong> ${m.church}</div>
+                        <div><strong>Date:</strong> ${dateLabel}</div>
+                    </div>
+                </div>
+                <span class="print-badge" style="${badgeStyle}">${m.status}</span>
             `;
-            printTargetBody.appendChild(row);
+            cardTargetContainer.appendChild(card);
         });
     }
 
-    // Hide standard layout blocks and swap into report system view wrapper
     document.querySelectorAll('.web-ui-element').forEach(el => el.style.display = 'none');
     document.getElementById("printReportView").style.display = "block";
 };
@@ -140,7 +142,6 @@ window.closePrintLayout = function() {
     });
 };
 
-// 4. HISTORICAL RECOVERY CLEAN DOWN-DOWNLOAD GENERATORS
 window.exportList = function(targetStatus) {
     const dataToExport = targetStatus === 'approved' ? approvedMembersMemoryCache : pendingMembersMemoryCache;
     if (dataToExport.length === 0) { alert("⚠️ List is empty."); return; }
