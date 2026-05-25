@@ -199,7 +199,7 @@ button:hover {
 </div>
 
 <script>
-// Dynamic FileReader Engine with Base64 Conversion Storage
+// Dynamic Canvas Compressor Engine for Firestore Payload Security
 const photoInput = document.getElementById("photo");
 const previewImage = document.getElementById("previewImage");
 const base64HiddenInput = document.getElementById("photoBase64String");
@@ -207,9 +207,9 @@ const base64HiddenInput = document.getElementById("photoBase64String");
 photoInput.addEventListener("change", function(){
     const file = this.files[0];
     if (file) {
-        // Updated limit check to accept images up to 3MB seamlessly (3 * 1024 * 1024 bytes)
+        // Enforce user sanity check boundary parameter
         if (file.size > 3 * 1024 * 1024) { 
-            alert("⚠️ The chosen photo is too large! Please choose an image smaller than 3MB.");
+            alert("⚠️ The chosen photo file size is too large. Please select an image under 3MB.");
             this.value = "";
             previewImage.style.display = "none";
             base64HiddenInput.value = "";
@@ -218,12 +218,46 @@ photoInput.addEventListener("change", function(){
 
         const reader = new FileReader();
         reader.onload = function(e){
-            const imageString = e.target.result;
-            previewImage.src = imageString;
-            previewImage.style.display = "block";
-            // Store the text string inside our hidden element container so your external script can catch it!
-            base64HiddenInput.value = imageString;
-        }
+            const img = new Image();
+            img.src = e.target.result;
+            
+            img.onload = function() {
+                const canvas = document.createElement("canvas");
+                let width = img.width;
+                let height = img.height;
+                
+                // Set the maximum profile avatar scale parameters
+                const MAX_WIDTH = 400;
+                const MAX_HEIGHT = 400;
+                
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                
+                // Draw downsampled frame mapping matrix
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Render as structured high-density compressed JPEG format payload
+                const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+                
+                // Feed string arrays downstream to DOM target nodes
+                previewImage.src = compressedBase64;
+                previewImage.style.display = "block";
+                base64HiddenInput.value = compressedBase64;
+            };
+        };
         reader.readAsDataURL(file);
     }
 });
