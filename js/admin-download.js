@@ -82,7 +82,7 @@ function renderTableRows(dataset, elementId) {
     dataset.forEach(m => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td><img src="${m.photoURL}" class="row-avatar" alt="Avatar"></td>
+            <td><img src="${m.photoURL}" class="row-avatar" alt="Avatar" style="width:35px; height:35px; border-radius:50%; object-fit:cover;"></td>
             <td><strong>${m.name}</strong></td>
             <td>${m.phone}</td>
             <td>${m.village}</td>
@@ -109,13 +109,13 @@ function buildPrintableCards() {
     if (!cardTargetContainer) return;
     cardTargetContainer.innerHTML = "";
 
-    // Sync button UI classes
+    // Sync interactive active style layout highlights
     document.querySelectorAll('.print-filter-tabs .filter-btn').forEach(btn => btn.classList.remove('active'));
     if (currentPrintFilter === 'all') document.getElementById("tabBtnAll")?.classList.add('active');
     if (currentPrintFilter === 'approved') document.getElementById("tabBtnApproved")?.classList.add('active');
     if (currentPrintFilter === 'pending') document.getElementById("tabBtnPending")?.classList.add('active');
 
-    // Filter memory state cache vectors
+    // Route correct filtered vector data resource
     let targetDataset = [];
     if (currentPrintFilter === "all") {
         targetDataset = [...approvedMembersMemoryCache, ...pendingMembersMemoryCache];
@@ -126,11 +126,11 @@ function buildPrintableCards() {
     }
 
     if (targetDataset.length === 0) {
-        cardTargetContainer.innerHTML = `<div style="text-align:center; padding:40px; color:#475569; font-weight:bold;">No contextual matching roster profiles found for selection block.</div>`;
+        cardTargetContainer.innerHTML = `<div style="text-align:center; padding:40px; color:#475569; font-weight:bold;">No matching church records found for this view scope.</div>`;
         return;
     }
 
-    // 👑 Flex row layout logic to fix mobile columns cascading error bugs 
+    // Loop through records to build row components (Bypasses cascading grid errors)
     targetDataset.forEach(m => {
         const card = document.createElement("div");
         card.className = "member-print-card";
@@ -157,7 +157,7 @@ function buildPrintableCards() {
     });
 }
 
-// Live interactive trigger for UI filtering tabs
+// 👑 GLOBAL MODULE EXPOSURE: Resolves scope freezes for onclick executions
 window.switchPrintFilter = function(filterType) {
     currentPrintFilter = filterType;
     buildPrintableCards();
