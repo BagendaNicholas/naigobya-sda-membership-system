@@ -273,6 +273,35 @@ tr:hover td { background: #1e293b; color: white; }
     width: 100%;
 }
 
+/* 🌟 DYNAMIC SYSTEMS DEV FOOTER DESIGN */
+.print-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px dashed #cbd5e1;
+    text-align: center;
+    page-break-inside: avoid;
+}
+.print-footer p {
+    margin: 0 0 10px 0;
+    font-size: 11px;
+    color: #475569;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.developer-footer-logo {
+    height: 40px;
+    width: auto;
+    display: block;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
 @media print {
     body { background: white !important; color: black !important; }
     body * { display: none !important; }
@@ -286,6 +315,9 @@ tr:hover td { background: #1e293b; color: white; }
     .print-info-value { display: inline-block !important; width: 65% !important; }
     
     .print-header { display: flex !important; align-items: center !important; }
+    .print-footer { display: flex !important; margin-top: 50px !important; }
+    .print-footer p { color: #555555 !important; }
+    
     .no-print-actions, .print-filter-tabs { display: none !important; }
     #printReportView { padding: 0 !important; background: white !important; color: black !important; }
 }
@@ -386,8 +418,42 @@ tr:hover td { background: #1e293b; color: white; }
       </div>
 
       <div class="print-cards-container" id="printableMasterCards"></div>
+
+      <footer class="print-footer">
+          <p>System Powered & Maintained By</p>
+          <div id="footerTouchArea" style="display:inline-block;">
+              <img src="images/Mon_21_07_2025_16_26_06.png" class="developer-footer-logo" alt="Developer System Signet">
+          </div>
+      </footer>
   </div>
 
-  <script type="module" src="js/admin-download.js"></script>
+  <script type="module">
+      import "./js/admin-download.js";
+      
+      // Wire up the double tap interaction directly onto the footer element workspace
+      document.addEventListener("DOMContentLoaded", () => {
+          const touchArea = document.getElementById("footerTouchArea");
+          if (!touchArea) return;
+
+          let lastTap = 0;
+          
+          // Handle desktop environments via native double-click
+          touchArea.addEventListener("dblclick", () => {
+              window.open("https://bagendanicholas.github.io/My-website-/index.html", "_blank");
+          });
+
+          // Handle custom rapid double-tap touch sequences for mobile viewports
+          touchArea.addEventListener("touchend", (e) => {
+              const now = new Date().getTime();
+              const timespan = now - lastTap;
+              
+              if (timespan < 300 && timespan > 0) {
+                  window.open("https://bagendanicholas.github.io/My-website-/index.html", "_blank");
+                  e.preventDefault(); // Defends layout from native browser zoom cycles
+              }
+              lastTap = now;
+          });
+      });
+  </script>
 </body>
 </html>
