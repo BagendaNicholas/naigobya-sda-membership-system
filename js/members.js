@@ -101,30 +101,21 @@ async function loadMemberProfileData(uid) {
     }
 }
 
-// 3. LISTEN FOR RE-UPLOADED IMAGE PROFILE CHANGES
+// 3. LISTEN FOR RE-UPLOADED IMAGE PROFILE CHANGES (CLEANED UP FOR BACKGROUND ENGINE COMPATIBILITY)
+// The HTML script block inside church-members.html handles the heavy background canvas down-sampling.
+// This block safely resets UI states if needed.
 const fileSelectorInput = document.getElementById("updatePhoto");
 if (fileSelectorInput) {
     fileSelectorInput.addEventListener("change", function () {
         const selectedFile = this.files[0];
         if (selectedFile) {
-            // Mirroring the updated registration file size cap of 3MB
-            if (selectedFile.size > 3 * 1024 * 1024) { 
-                alert("⚠️ Image size is too large. Please keep photo selections under 3MB.");
+            // Initial safeguard against excessively huge allocations (>5MB)
+            if (selectedFile.size > 5 * 1024 * 1024) { 
+                alert("⚠️ Image size is too large. Please keep original photo selections under 5MB.");
                 this.value = "";
-                return;
+                const photoStatus = document.getElementById("photoStatus");
+                if (photoStatus) photoStatus.style.display = "none";
             }
-
-            const imgReader = new FileReader();
-            imgReader.onload = function (event) {
-                const imgDisplay = document.getElementById("displayAvatar");
-                if (imgDisplay) {
-                    imgDisplay.src = event.target.result;
-                }
-                
-                const rawStringBox = document.getElementById("updatePhotoBase64");
-                if (rawStringBox) rawStringBox.value = event.target.result;
-            };
-            imgReader.readAsDataURL(selectedFile);
         }
     });
 }
@@ -181,7 +172,7 @@ if (saveBtn) {
                 dobaptism: dobaptismField
             };
 
-            // Include the profile photo text string if a new one was uploaded
+            // Grab the tiny, space-optimized text string from our background cache loop container
             if (base64PhotoData) {
                 updateFieldsPayload.photoURL = base64PhotoData;
             }
@@ -194,6 +185,10 @@ if (saveBtn) {
             if (document.getElementById("welcomeName")) {
                 document.getElementById("welcomeName").innerText = nameField;
             }
+            
+            // Clean up the optimization alert layout box for clean future interactions
+            const photoStatus = document.getElementById("photoStatus");
+            if (photoStatus) photoStatus.style.display = "none";
 
         } catch (writeError) {
             console.error("Firestore submission transmission failed entirely:", writeError);
