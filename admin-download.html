@@ -227,7 +227,6 @@ tr:hover td { background: #1e293b; color: white; }
     padding-bottom: 4px;
 }
 
-/* 👑 FLEX ROW SYSTEM: Solves broken mobile browser column layout problems */
 .print-info-row {
     display: flex;
     justify-content: space-between;
@@ -273,7 +272,6 @@ tr:hover td { background: #1e293b; color: white; }
     width: 100%;
 }
 
-/* 🌟 DYNAMIC SYSTEMS DEV FOOTER DESIGN */
 .print-footer {
     display: flex;
     flex-direction: column;
@@ -302,24 +300,89 @@ tr:hover td { background: #1e293b; color: white; }
     -webkit-user-drag: none;
 }
 
+/* =========================================================
+   📥 HARDWARE PRINTER ENGINE ABSOLUTE OVERRIDES
+   ========================================================= */
 @media print {
-    body { background: white !important; color: black !important; }
-    body * { display: none !important; }
-    #printReportView, #printReportView * { display: block !important; }
+    /* Absolute hide for web UI viewports */
+    .web-ui-element, .navbar, .panel-container { 
+        display: none !important; 
+    }
     
-    .print-cards-container { display: flex !important; flex-direction: column !important; gap: 14px !important; }
-    .member-print-card { display: flex !important; align-items: flex-start !important; background: white !important; border: 1px solid #cbd5e1 !important; padding: 14px !important; }
+    /* Strict force removal of web controls to prevent empty top page margins */
+    .web-only-controls, 
+    .no-print-actions, 
+    .print-filter-tabs { 
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        overflow: hidden !important;
+    }
+
+    body { 
+        background: white !important; 
+        color: black !important; 
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    #printReportView { 
+        display: block !important;
+        padding: 0 !important; 
+        margin: 0 !important;
+        background: white !important; 
+        color: black !important; 
+    }
     
-    .print-info-row { display: flex !important; justify-content: space-between !important; }
-    .print-info-label { display: inline-block !important; width: 35% !important; }
-    .print-info-value { display: inline-block !important; width: 65% !important; }
-    
-    .print-header { display: flex !important; align-items: center !important; }
-    .print-footer { display: flex !important; margin-top: 50px !important; }
-    .print-footer p { color: #555555 !important; }
-    
-    .no-print-actions, .print-filter-tabs { display: none !important; }
-    #printReportView { padding: 0 !important; background: white !important; color: black !important; }
+    /* Force header content to anchor to the exact top edge of page 1 */
+    .print-header { 
+        display: flex !important; 
+        align-items: center !important;
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+
+    .print-cards-container { 
+        display: flex !important; 
+        flex-direction: column !important; 
+        gap: 14px !important; 
+    }
+
+    .member-print-card { 
+        display: flex !important; 
+        align-items: flex-start !important; 
+        background: white !important; 
+        border: 1px solid #cbd5e1 !important; 
+        padding: 14px !important; 
+    }
+
+    .print-info-row { 
+        display: flex !important; 
+        justify-content: space-between !important; 
+    }
+
+    .print-info-label { 
+        display: inline-block !important; 
+        width: 35% !important; 
+    }
+
+    .print-info-value { 
+        display: inline-block !important; 
+        width: 65% !important; 
+    }
+
+    .print-footer { 
+        display: flex !important; 
+        margin-top: 50px !important; 
+    }
+
+    .print-footer p { 
+        color: #555555 !important; 
+    }
 }
 </style>
 </head>
@@ -398,15 +461,18 @@ tr:hover td { background: #1e293b; color: white; }
   </div>
 
   <div id="printReportView">
-      <div class="no-print-actions">
-          <button class="btn-download" onclick="window.print()" style="background:#1e293b;">🖨️ Save as PDF Document</button>
-          <button class="btn-download" onclick="window.closePrintLayout()" style="background:#ef4444;">❌ Close Roster View</button>
-      </div>
+      
+      <div class="web-only-controls">
+          <div class="no-print-actions">
+              <button class="btn-download" onclick="window.print()" style="background:#1e293b;">🖨️ Save as PDF Document</button>
+              <button class="btn-download" onclick="window.closePrintLayout()" style="background:#ef4444;">❌ Close Roster View</button>
+          </div>
 
-      <div class="print-filter-tabs">
-          <button id="tabBtnAll" class="filter-btn active" onclick="window.switchPrintFilter('all')">All Members Mixed</button>
-          <button id="tabBtnApproved" class="filter-btn" onclick="window.switchPrintFilter('approved')">🟢 Approved List Only</button>
-          <button id="tabBtnPending" class="filter-btn" onclick="window.switchPrintFilter('pending')">🟡 Pending List Only</button>
+          <div class="print-filter-tabs">
+              <button id="tabBtnAll" class="filter-btn active" onclick="window.switchPrintFilter('all')">All Members Mixed</button>
+              <button id="tabBtnApproved" class="filter-btn" onclick="window.switchPrintFilter('approved')">🟢 Approved List Only</button>
+              <button id="tabBtnPending" class="filter-btn" onclick="window.switchPrintFilter('pending')">🟡 Pending List Only</button>
+          </div>
       </div>
 
       <div class="print-header">
@@ -430,26 +496,23 @@ tr:hover td { background: #1e293b; color: white; }
   <script type="module">
       import "./js/admin-download.js";
       
-      // Wire up the double tap interaction directly onto the footer element workspace
       document.addEventListener("DOMContentLoaded", () => {
           const touchArea = document.getElementById("footerTouchArea");
           if (!touchArea) return;
 
           let lastTap = 0;
           
-          // Handle desktop environments via native double-click
           touchArea.addEventListener("dblclick", () => {
               window.open("https://bagendanicholas.github.io/My-website-/index.html", "_blank");
           });
 
-          // Handle custom rapid double-tap touch sequences for mobile viewports
           touchArea.addEventListener("touchend", (e) => {
               const now = new Date().getTime();
               const timespan = now - lastTap;
               
               if (timespan < 300 && timespan > 0) {
                   window.open("https://bagendanicholas.github.io/My-website-/index.html", "_blank");
-                  e.preventDefault(); // Defends layout from native browser zoom cycles
+                  e.preventDefault();
               }
               lastTap = now;
           });
