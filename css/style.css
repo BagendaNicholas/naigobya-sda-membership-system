@@ -434,27 +434,27 @@ footer p{
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .filter-btn {
   width: 100%;
-  padding: 10px 12px;
-  border-radius: 6px;
+  padding: 12px;
+  border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
   border: 1px solid #cbd5e1;
   background: #f1f5f9;
   color: #334155;
-  font-size: 13px;
+  font-size: 14px;
   text-align: center;
   transition: all 0.2s ease;
 }
 
 .filter-btn.active {
-  background: #1e293b;
-  color: white;
-  border-color: #1e293b;
+  background: #1e293b !important;
+  color: white !important;
+  border-color: #1e293b !important;
 }
 
 /* Clean Document Banner Header */
@@ -463,7 +463,7 @@ footer p{
   align-items: center;
   border-bottom: 3px double #000000;
   padding-bottom: 15px;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   gap: 15px;
 }
 
@@ -487,7 +487,7 @@ footer p{
 }
 
 .print-logo {
-  height: 50px;
+  height: 55px;
   width: auto;
   display: block;
 }
@@ -496,7 +496,7 @@ footer p{
 .print-cards-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .member-print-card {
@@ -511,8 +511,8 @@ footer p{
 }
 
 .print-avatar {
-  width: 70px;
-  height: 70px;
+  width: 75px;
+  height: 75px;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid #334155;
@@ -534,7 +534,7 @@ footer p{
   padding-bottom: 4px;
 }
 
-/* 👑 FLEX ROW STRATEGY: Bypasses broken mobile browser CSS-Grid print states */
+/* Row Architecture Strategy */
 .print-info-row {
   display: flex;
   justify-content: space-between;
@@ -558,9 +558,9 @@ footer p{
 }
 
 .print-badge {
-  padding: 2px 6px;
+  padding: 3px 8px;
   border-radius: 4px;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: bold;
   text-transform: uppercase;
   border: 1px solid #000000;
@@ -570,9 +570,9 @@ footer p{
 
 .no-print-actions {
   background: #f8fafc;
-  padding: 12px;
+  padding: 14px;
   border-radius: 8px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -605,7 +605,7 @@ footer p{
   .print-cards-container {
     display: flex !important;
     flex-direction: column !important;
-    gap: 12px !important;
+    gap: 14px !important;
   }
   
   .member-print-card {
