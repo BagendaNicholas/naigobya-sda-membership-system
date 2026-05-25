@@ -6,6 +6,7 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.13.0/
 const ADMIN_EMAIL = "nicholasbagenda@gmail.com";
 let approvedMembersMemoryCache = [];
 let pendingMembersMemoryCache = [];
+let currentPrintFilter = "all"; // Tracks active structural context array filter
 
 // 1. SECURITY TIMEOUT ENGINE CHECK
 onAuthStateChanged(auth, async (user) => {
@@ -92,46 +93,74 @@ function renderTableRows(dataset, elementId) {
     });
 }
 
-// 3. GENERATE MOBILE PROFILE PRINT CARD ENTRIES
-window.activatePrintLayout = function() {
+// 3. GENERATE MOBILE PROFILE PRINT CARD ENTRIES (FLEX INJECTION)
+window.activatePrintLayout = function(defaultFilter = 'all') {
+    currentPrintFilter = defaultFilter;
+    buildPrintableCards();
+
+    document.querySelectorAll('.web-ui-element').forEach(el => el.style.display = 'none');
+    document.getElementById("printReportView").style.display = "block";
+    window.scrollTo(0, 0);
+};
+
+// Refactored array processing module with tab states toggles
+function buildPrintableCards() {
     const cardTargetContainer = document.getElementById("printableMasterCards");
     if (!cardTargetContainer) return;
     cardTargetContainer.innerHTML = "";
 
-    const combinedMasterList = [...approvedMembersMemoryCache, ...pendingMembersMemoryCache];
+    // Sync button UI classes
+    document.querySelectorAll('.print-filter-tabs .filter-btn').forEach(btn => btn.classList.remove('active'));
+    if (currentPrintFilter === 'all') document.getElementById("tabBtnAll")?.classList.add('active');
+    if (currentPrintFilter === 'approved') document.getElementById("tabBtnApproved")?.classList.add('active');
+    if (currentPrintFilter === 'pending') document.getElementById("tabBtnPending")?.classList.add('active');
 
-    if (combinedMasterList.length === 0) {
-        cardTargetContainer.innerHTML = `<div style="text-align:center; padding:30px;">No congregation data logged to generate reports.</div>`;
-    } else {
-        combinedMasterList.forEach(m => {
-            const card = document.createElement("div");
-            card.className = "member-print-card";
-            
-            const isApproved = m.status.toLowerCase() === "approved";
-            const badgeStyle = isApproved ? "background:#dcfce7; color:#15803d; border-color:#15803d;" : "background:#fef3c7; color:#b45309; border-color:#b45309;";
-            const dateLabel = isApproved ? `Baptized: ${m.dobaptism}` : `Registered: ${m.createdAt}`;
-
-            card.innerHTML = `
-                <img src="${m.photoURL}" class="print-avatar" alt="Profile">
-                <div class="print-card-details">
-                    <h4>${m.name}</h4>
-                    <div class="print-info-grid">
-                        <div><strong>Phone:</strong> ${m.phone}</div>
-                        <div><strong>DOB:</strong> ${m.dob}</div>
-                        <div><strong>Village:</strong> ${m.village}</div>
-                        <div><strong>District:</strong> ${m.district}</div>
-                        <div><strong>Church:</strong> ${m.church}</div>
-                        <div><strong>Date:</strong> ${dateLabel}</div>
-                    </div>
-                </div>
-                <span class="print-badge" style="${badgeStyle}">${m.status}</span>
-            `;
-            cardTargetContainer.appendChild(card);
-        });
+    // Filter memory state cache vectors
+    let targetDataset = [];
+    if (currentPrintFilter === "all") {
+        targetDataset = [...approvedMembersMemoryCache, ...pendingMembersMemoryCache];
+    } else if (currentPrintFilter === "approved") {
+        targetDataset = approvedMembersMemoryCache;
+    } else if (currentPrintFilter === "pending") {
+        targetDataset = pendingMembersMemoryCache;
     }
 
-    document.querySelectorAll('.web-ui-element').forEach(el => el.style.display = 'none');
-    document.getElementById("printReportView").style.display = "block";
+    if (targetDataset.length === 0) {
+        cardTargetContainer.innerHTML = `<div style="text-align:center; padding:40px; color:#475569; font-weight:bold;">No contextual matching roster profiles found for selection block.</div>`;
+        return;
+    }
+
+    // 👑 Flex row layout logic to fix mobile columns cascading error bugs 
+    targetDataset.forEach(m => {
+        const card = document.createElement("div");
+        card.className = "member-print-card";
+        
+        const isApproved = m.status.toLowerCase() === "approved";
+        const badgeStyle = isApproved ? "background:#dcfce7; color:#15803d; border-color:#15803d;" : "background:#fef3c7; color:#b45309; border-color:#b45309;";
+        const dateLabel = isApproved ? "Baptized Date" : "Registered Date";
+        const dateValue = isApproved ? m.dobaptism : m.createdAt;
+
+        card.innerHTML = `
+            <img src="${m.photoURL}" class="print-avatar" alt="Profile">
+            <div class="print-card-details">
+                <h4>${m.name}</h4>
+                <div class="print-info-row"><span class="print-info-label">Phone:</span><span class="print-info-value">${m.phone}</span></div>
+                <div class="print-info-row"><span class="print-info-label">DOB:</span><span class="print-info-value">${m.dob}</span></div>
+                <div class="print-info-row"><span class="print-info-label">Village:</span><span class="print-info-value">${m.village}</span></div>
+                <div class="print-info-row"><span class="print-info-label">District:</span><span class="print-info-value">${m.district}</span></div>
+                <div class="print-info-row"><span class="print-info-label">Church:</span><span class="print-info-value">${m.church}</span></div>
+                <div class="print-info-row"><span class="print-info-label">${dateLabel}:</span><span class="print-info-value">${dateValue}</span></div>
+            </div>
+            <span class="print-badge" style="${badgeStyle}">${m.status}</span>
+        `;
+        cardTargetContainer.appendChild(card);
+    });
+}
+
+// Live interactive trigger for UI filtering tabs
+window.switchPrintFilter = function(filterType) {
+    currentPrintFilter = filterType;
+    buildPrintableCards();
 };
 
 window.closePrintLayout = function() {
