@@ -118,6 +118,13 @@ button.btn-save:hover { opacity: 0.9; }
     color: #22c55e;
     font-weight: bold;
 }
+#photoStatus {
+    display: none;
+    font-size: 0.85rem;
+    color: #22c55e;
+    font-weight: bold;
+    margin-top: 5px;
+}
 @media(max-width:768px) {
     .container { margin: 20px; padding: 20px; }
 }
@@ -202,6 +209,7 @@ button.btn-save:hover { opacity: 0.9; }
     <div class="file-box">
         <label style="color: #cbd5e1; font-size: 0.85rem;">Update Profile Photo</label><br><br>
         <input type="file" id="updatePhoto" accept="image/*">
+        <div id="photoStatus">⚡ Photo optimized automatically!</div>
         <input type="hidden" id="updatePhotoBase64" value="">
     </div>
 
@@ -215,28 +223,68 @@ button.btn-save:hover { opacity: 0.9; }
 </div>
 
 <script>
-// Live update file selection processing engine with matching 3MB cap
+// INSTANT BACKGROUND CANVAS COMPRESSOR ENGINE
 const updatePhotoInput = document.getElementById("updatePhoto");
 const displayAvatar = document.getElementById("displayAvatar");
 const updatePhotoBase64 = document.getElementById("updatePhotoBase64");
+const photoStatus = document.getElementById("photoStatus");
 
 if (updatePhotoInput) {
     updatePhotoInput.addEventListener("change", function() {
         const file = this.files[0];
         if (file) {
-            // Enforce a matching 3MB size cap limit rule parameter criteria
-            if (file.size > 3 * 1024 * 1024) {
-                alert("⚠️ Chosen file size is too large. Please select a photo under 3MB.");
+            // Allow uploads up to 5MB initially for high-res device compatibility
+            if (file.size > 5 * 1024 * 1024) {
+                alert("⚠️ Chosen file size is too large. Please select a photo under 5MB.");
                 this.value = "";
                 updatePhotoBase64.value = "";
+                photoStatus.style.display = "none";
                 return;
             }
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const imgString = e.target.result;
-                displayAvatar.src = imgString;
-                updatePhotoBase64.value = imgString;
+                const img = new Image();
+                img.src = e.target.result;
+                
+                img.onload = function() {
+                    const canvas = document.createElement("canvas");
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    // Profile avatar dimension boundaries
+                    const MAX_WIDTH = 400;
+                    const MAX_HEIGHT = 400;
+                    
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Process compression matrix out of view
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Squash directly into an ultra-lean compressed JPEG data text string
+                    const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+                    
+                    // Direct updates to UI fields and document state container cache
+                    displayAvatar.src = compressedBase64;
+                    updatePhotoBase64.value = compressedBase64;
+                    
+                    // Display success confirmation
+                    photoStatus.style.display = "block";
+                };
             };
             reader.readAsDataURL(file);
         }
