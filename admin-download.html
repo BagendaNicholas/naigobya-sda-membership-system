@@ -157,103 +157,137 @@ tr:hover td { background: #1e293b; color: white; }
     align-items: center;
     border-bottom: 3px double #000;
     padding-bottom: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     gap: 15px;
 }
 .print-title-block { text-align: left; }
 .print-title-block h1 { margin: 0; font-size: 18px; text-transform: uppercase; color: #111; font-weight: bold; }
 .print-title-block p { margin: 4px 0 0 0; font-size: 12px; color: #444; font-weight: bold; }
-.print-logo { height: 60px; width: auto; display: block; }
+.print-logo { height: 55px; width: auto; display: block; }
 
 .print-filter-tabs {
     display: flex;
+    flex-direction: column;
     gap: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 .filter-btn {
-    padding: 8px 12px;
-    border-radius: 6px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
     border: 1px solid #cbd5e1;
     background: #f1f5f9;
     color: #334155;
-    font-size: 11px;
+    font-size: 14px;
+    text-align: center;
+    transition: all 0.2s ease;
 }
 .filter-btn.active {
-    background: #1e293b;
-    color: white;
-    border-color: #1e293b;
+    background: #1e293b !important;
+    color: white !important;
+    border-color: #1e293b !important;
 }
 
 .print-cards-container {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 .member-print-card {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
     border-radius: 8px;
-    padding: 12px;
+    padding: 14px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 15px;
     page-break-inside: avoid;
 }
 .print-avatar {
-    width: 65px;
-    height: 65px;
+    width: 75px;
+    height: 75px;
     border-radius: 50%;
     object-fit: cover;
     border: 1px solid #334155;
     flex-shrink: 0;
+    margin-top: 2px;
 }
 .print-card-details {
     flex-grow: 1;
 }
 .print-card-details h4 {
-    margin: 0 0 4px 0;
-    font-size: 14px;
-    color: #000;
+    margin: 0 0 8px 0;
+    font-size: 15px;
+    color: #000 !important;
     font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 1px dashed #cbd5e1;
+    padding-bottom: 4px;
 }
-.print-info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px 10px;
-    font-size: 11px;
-    color: #334155;
+
+/* 👑 FLEX ROW SYSTEM: Solves broken mobile browser column layout problems */
+.print-info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 12px;
+    color: #222222 !important;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 2px;
+}
+.print-info-label {
+    font-weight: bold;
+    color: #555555;
+    width: 35%;
+    flex-shrink: 0;
+}
+.print-info-value {
+    width: 65%;
+    text-align: left;
 }
 .print-badge {
-    padding: 2px 6px;
+    padding: 3px 8px;
     border-radius: 4px;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: bold;
     text-transform: uppercase;
     border: 1px solid #000;
+    align-self: flex-start;
+    flex-shrink: 0;
 }
 
 .no-print-actions {
     background: #f8fafc;
-    padding: 12px;
+    padding: 14px;
     border-radius: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 10px;
     border: 1px solid #cbd5e1;
     align-items: center;
 }
+.no-print-actions button {
+    width: 100%;
+}
 
 @media print {
+    body { background: white !important; color: black !important; }
     body * { display: none !important; }
     #printReportView, #printReportView * { display: block !important; }
-    .print-cards-container { display: flex !important; flex-direction: column !important; }
-    .member-print-card { display: flex !important; align-items: center !important; background: white !important; }
-    .print-info-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; }
+    
+    .print-cards-container { display: flex !important; flex-direction: column !important; gap: 14px !important; }
+    .member-print-card { display: flex !important; align-items: flex-start !important; background: white !important; border: 1px solid #cbd5e1 !important; padding: 14px !important; }
+    
+    .print-info-row { display: flex !important; justify-content: space-between !important; }
+    .print-info-label { display: inline-block !important; width: 35% !important; }
+    .print-info-value { display: inline-block !important; width: 65% !important; }
+    
+    .print-header { display: flex !important; align-items: center !important; }
     .no-print-actions, .print-filter-tabs { display: none !important; }
-    #printReportView { padding: 0; background: white; color: black; }
+    #printReportView { padding: 0 !important; background: white !important; color: black !important; }
 }
 </style>
 </head>
@@ -273,9 +307,9 @@ tr:hover td { background: #1e293b; color: white; }
   <div class="web-ui-element panel-container">
     <div class="panel-header">
       <h2>📋 Member Records Export Panel</h2>
-      <div style="display: flex; gap: 10px;">
-         <button class="btn-download btn-print-view" onclick="activatePrintLayout('all')">🖨️ View Professional Printable Roster</button>
-         <button class="btn-download" onclick="downloadBothLists()">📥 Download Excel CSV</button>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+         <button class="btn-download btn-print-view" onclick="window.activatePrintLayout('all')">🖨️ View Professional Printable Roster</button>
+         <button class="btn-download" onclick="window.downloadBothLists()">📥 Download Excel CSV</button>
       </div>
     </div>
 
@@ -288,7 +322,7 @@ tr:hover td { background: #1e293b; color: white; }
         <div class="section-box" style="border-top: 4px solid #22c55e;">
             <div class="section-header">
                 <h3>🟢 Approved Members <span id="approvedCount" class="badge-count count-approved">0</span></h3>
-                <button class="btn-download" onclick="exportList('approved')">💾 Download Approved CSV</button>
+                <button class="btn-download" onclick="window.exportList('approved')">💾 Download Approved CSV</button>
             </div>
             <div class="table-wrapper">
                 <table>
@@ -310,7 +344,7 @@ tr:hover td { background: #1e293b; color: white; }
         <div class="section-box" style="border-top: 4px solid #f59e0b;">
             <div class="section-header">
                 <h3>🟡 Pending Verification <span id="pendingCount" class="badge-count count-pending">0</span></h3>
-                <button class="btn-download btn-pending-dl" onclick="exportList('pending')">💾 Download Pending CSV</button>
+                <button class="btn-download btn-pending-dl" onclick="window.exportList('pending')">💾 Download Pending CSV</button>
             </div>
             <div class="table-wrapper">
                 <table>
@@ -334,14 +368,13 @@ tr:hover td { background: #1e293b; color: white; }
   <div id="printReportView">
       <div class="no-print-actions">
           <button class="btn-download" onclick="window.print()" style="background:#1e293b;">🖨️ Save as PDF Document</button>
-          <button class="btn-download" onclick="closePrintLayout()" style="background:#ef4444;">❌ Close Roster View</button>
-          <span style="color:#475569; font-size:12px; margin-left:10px;">Filter list scope before printing:</span>
+          <button class="btn-download" onclick="window.closePrintLayout()" style="background:#ef4444;">❌ Close Roster View</button>
       </div>
 
       <div class="print-filter-tabs">
-          <button id="tabBtnAll" class="filter-btn active" onclick="switchPrintFilter('all')">All Members Mixed</button>
-          <button id="tabBtnApproved" class="filter-btn" onclick="switchPrintFilter('approved')">🟢 Approved List Only</button>
-          <button id="tabBtnPending" class="filter-btn" onclick="switchPrintFilter('pending')">🟡 Pending List Only</button>
+          <button id="tabBtnAll" class="filter-btn active" onclick="window.switchPrintFilter('all')">All Members Mixed</button>
+          <button id="tabBtnApproved" class="filter-btn" onclick="window.switchPrintFilter('approved')">🟢 Approved List Only</button>
+          <button id="tabBtnPending" class="filter-btn" onclick="window.switchPrintFilter('pending')">🟡 Pending List Only</button>
       </div>
 
       <div class="print-header">
