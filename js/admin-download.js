@@ -26,6 +26,10 @@ async function buildChurchLedgerData() {
 
         querySnapshot.forEach((doc) => {
             const data = doc.data();
+            
+            // Build fallback initial generator link if photo URL is missing
+            const fallbackAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(data.name || 'Member')}`;
+            
             const memberObj = {
                 name: data.name || "N/A",
                 dob: data.dob || "N/A",
@@ -39,6 +43,7 @@ async function buildChurchLedgerData() {
                 area: data.area || "N/A",
                 pastor: data.pastor || "N/A",
                 dobaptism: data.dobaptism || "N/A",
+                photoURL: data.photoURL || fallbackAvatar,
                 status: data.status || "pending",
                 createdAt: data.createdAt ? data.createdAt.substring(0, 10) : "N/A"
             };
@@ -50,21 +55,21 @@ async function buildChurchLedgerData() {
             }
         });
 
-        // Update counts on UI elements
+        // Update web counts
         document.getElementById("approvedCount").innerText = approvedMembersMemoryCache.length;
         document.getElementById("pendingCount").innerText = pendingMembersMemoryCache.length;
 
-        // Render distinct data tables
+        // Render interactive data tables
         renderTableRows(approvedMembersMemoryCache, "approvedTableBody");
         renderTableRows(pendingMembersMemoryCache, "pendingTableBody");
 
-        // Turn off loading screen indicator and reveal tables
+        // Turn off loading screen
         document.getElementById("masterLoading").style.display = "none";
         document.getElementById("portalContent").style.display = "block";
 
     } catch (err) {
         console.error("Failed to read church records roster:", err);
-        alert("⚠️ Access Error: Ensure your security rules are published in Firebase. Details: " + err.message);
+        alert("⚠️ Access Error: " + err.message);
     }
 }
 
@@ -81,33 +86,70 @@ function renderTableRows(dataset, elementId) {
     dataset.forEach(m => {
         const row = document.createElement("tr");
         row.innerHTML = `
+            <td><img src="${m.photoURL}" class="row-avatar" alt="Avatar"></td>
             <td><strong>${m.name}</strong></td>
             <td>${m.phone}</td>
             <td>${m.village}</td>
             <td>${m.district}</td>
-            <td>${m.church}</td>
             <td>${elementId === "approvedTableBody" ? m.dobaptism : m.createdAt}</td>
         `;
         tableBody.appendChild(row);
     });
 }
 
-// 3. EXPORT CONTROLLER ENGINES (EXPOSED GLOBALLY)
+// 3. RUN INTERACTIVE PRINTABLE REPORT SHEET GENERATOR
+window.activatePrintLayout = function() {
+    const printTargetBody = document.getElementById("printableMasterRows");
+    if (!printTargetBody) return;
+    printTargetBody.innerHTML = "";
+
+    const combinedMasterList = [...approvedMembersMemoryCache, ...pendingMembersMemoryCache];
+
+    if (combinedMasterList.length === 0) {
+        printTargetBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px;">No congregation data logged to generate reports.</td></tr>`;
+    } else {
+        combinedMasterList.forEach(m => {
+            const row = document.createElement("tr");
+            const isApproved = m.status.toLowerCase() === "approved";
+            const statusStyle = isApproved ? "background:#dcfce7; color:#15803d; border-color:#15803d;" : "background:#fef3c7; color:#b45309; border-color:#b45309;";
+            
+            row.innerHTML = `
+                <td style="text-align:center;"><img src="${m.photoURL}" class="print-avatar" alt="Profile"></td>
+                <td><strong>${m.name}</strong><br><span style="font-size:10px; color:#555;">DOB: ${m.dob}</span></td>
+                <td>${m.phone}</td>
+                <td>${m.village}</td>
+                <td>${m.district}</td>
+                <td>${m.church}</td>
+                <td>${isApproved ? m.dobaptism : m.createdAt}</td>
+                <td style="text-align:center;"><span class="print-badge" style="${statusStyle}">${m.status.toUpperCase()}</span></td>
+            `;
+            printTargetBody.appendChild(row);
+        });
+    }
+
+    // Hide standard layout blocks and swap into report system view wrapper
+    document.querySelectorAll('.web-ui-element').forEach(el => el.style.display = 'none');
+    document.getElementById("printReportView").style.display = "block";
+};
+
+window.closePrintLayout = function() {
+    document.getElementById("printReportView").style.display = "none";
+    document.querySelectorAll('.web-ui-element').forEach(el => {
+        if(el.classList.contains('panel-container')) el.style.display = 'block';
+        if(el.classList.contains('navbar')) el.style.display = 'flex';
+    });
+};
+
+// 4. HISTORICAL RECOVERY CLEAN DOWN-DOWNLOAD GENERATORS
 window.exportList = function(targetStatus) {
     const dataToExport = targetStatus === 'approved' ? approvedMembersMemoryCache : pendingMembersMemoryCache;
-    if (dataToExport.length === 0) {
-        alert("⚠️ Export canceled: The chosen list is currently empty.");
-        return;
-    }
+    if (dataToExport.length === 0) { alert("⚠️ List is empty."); return; }
     generateCSVFile(dataToExport, `Naigobya_SDA_${targetStatus}_members`);
 };
 
 window.downloadBothLists = function() {
     const combinedData = [...approvedMembersMemoryCache, ...pendingMembersMemoryCache];
-    if (combinedData.length === 0) {
-        alert("⚠️ Export canceled: There are zero records available.");
-        return;
-    }
+    if (combinedData.length === 0) { alert("⚠️ Roster is empty."); return; }
     generateCSVFile(combinedData, "Naigobya_SDA_All_Members_Master_Ledger");
 };
 
@@ -120,10 +162,9 @@ function generateCSVFile(arrayData, filename) {
             row.name, row.dob, row.phone, row.email, row.village, row.county, 
             row.district, row.country, row.church, row.area, row.pastor, row.dobaptism, row.status.toUpperCase()
         ];
-        
-        const sanitizedValues = values.map(value => {
-            const cleanString = ("" + value).replace(/"/g, '""'); 
-            return cleanString.includes(",") ? `"${cleanString}"` : cleanString;
+        const sanitizedValues = values.map(v => {
+            const clean = ("" + v).replace(/"/g, '""'); 
+            return clean.includes(",") ? `"${clean}"` : clean;
         });
         csvRows.push(sanitizedValues.join(","));
     }
@@ -131,12 +172,9 @@ function generateCSVFile(arrayData, filename) {
     const csvContent = "\uFEFF" + csvRows.join("\n"); 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
-    
     if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
+        link.setAttribute("href", URL.createObjectURL(blob));
         link.setAttribute("download", `${filename}.csv`);
-        link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
