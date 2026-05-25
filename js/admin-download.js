@@ -210,3 +210,39 @@ function generateCSVFile(arrayData, filename) {
         document.body.removeChild(link);
     }
 }
+window.activatePrintLayout = function(defaultFilter = 'all') {
+    currentPrintFilter = defaultFilter;
+    buildPrintableCards();
+
+    document.querySelectorAll('.web-ui-element').forEach(el => el.style.display = 'none');
+    document.getElementById("printReportView").style.display = "block";
+    window.scrollTo(0, 0);
+
+    // 📱 MOBILE DOUBLE-TAP LISTENER RIGGING
+    const footerLink = document.getElementById("footerLogoLink");
+    if (footerLink) {
+        let lastTapTime = 0;
+        
+        // Prevent default single tap action completely on mobile screens
+        footerLink.addEventListener("click", function(e) {
+            // If it's a simulated touch click, block it. Desktop double clicks work normally.
+            if (e.pointerType === 'touch' || window.matchMedia("(pointer: coarse)").matches) {
+                e.preventDefault();
+            }
+        });
+
+        // Track custom double touch intervals
+        footerLink.addEventListener("touchend", function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            
+            if (tapLength < 300 && tapLength > 0) {
+                // Success: Direct double tap verified!
+                window.open("https://bagendanicholas.github.io/My-website-/index.html", "_blank");
+                e.preventDefault();
+            }
+            lastTapTime = currentTime;
+        });
+    }
+};
+
