@@ -22,7 +22,7 @@ window.registerUser = async function () {
   const pastor = document.getElementById("pastor").value.trim();
   const dobaptism = document.getElementById("dobaptism").value;
   
-  // Grab the base64 string from the hidden input managed by the HTML reader engine
+  // Grab the compressed image string managed by the canvas compression script
   const photoBase64String = document.getElementById("photoBase64String").value;
   const loading = document.getElementById("loading");
 
@@ -53,7 +53,7 @@ window.registerUser = async function () {
     const user = userCred.user;
 
     // 5. WRITE RECORD DIRECTLY INTO CLOUD FIRESTORE
-    // Bundles all 10 fields cleanly into the database document path
+    // Bundles all 10 fields cleanly into the database document path safely below the 1MB limit
     await setDoc(doc(db, "members", user.uid), {
       uid: user.uid,
       name: name,
@@ -69,7 +69,7 @@ window.registerUser = async function () {
       area: area,
       pastor: pastor,
       dobaptism: dobaptism,
-      photoURL: photoBase64String, // Saves the converted image text string safely
+      photoURL: photoBase64String, // Saves the compressed canvas image payload safely
       status: "pending",
       role: "member",
       createdAt: new Date().toISOString()
@@ -77,7 +77,7 @@ window.registerUser = async function () {
 
     alert("✅ Member Registration Completed Successfully!");
 
-    // 6. REDIRECT DIRECTLY TO THE ADMIN INTERFACE PIPELINE OR INDEX
+    // 6. REDIRECT DIRECTLY TO THE INDEX HOME PAGE
     window.location.href = "index.html";
 
   } catch (error) {
