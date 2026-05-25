@@ -69,26 +69,44 @@ async function buildChurchLedgerData() {
     }
 }
 
+// 👑 UPDATED DYNAMIC RENDERER: Synchronized completely with layout table columns
 function renderTableRows(dataset, elementId) {
     const tableBody = document.getElementById(elementId);
     if (!tableBody) return;
     tableBody.innerHTML = "";
 
     if (dataset.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b; padding:20px;">No records found.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#64748b; padding:20px;">No records found.</td></tr>`;
         return;
     }
 
     dataset.forEach(m => {
         const row = document.createElement("tr");
-        row.innerHTML = `
-            <td><img src="${m.photoURL}" class="row-avatar" alt="Avatar" style="width:35px; height:35px; border-radius:50%; object-fit:cover;"></td>
-            <td><strong>${m.name}</strong></td>
-            <td>${m.phone}</td>
-            <td>${m.village}</td>
-            <td>${m.district}</td>
-            <td>${elementId === "approvedTableBody" ? m.dobaptism : m.createdAt}</td>
-        `;
+        if (elementId === "approvedTableBody") {
+            row.innerHTML = `
+                <td><img src="${m.photoURL}" class="row-avatar" alt="Avatar" style="width:35px; height:35px; border-radius:50%; object-fit:cover;"></td>
+                <td><strong>${m.name}</strong></td>
+                <td>${m.dob}</td>
+                <td>${m.phone}</td>
+                <td>${m.village}</td>
+                <td>${m.district}</td>
+                <td>${m.country}</td>
+                <td>${m.dobaptism}</td>
+                <td>${m.pastor}</td>
+            `;
+        } else {
+            row.innerHTML = `
+                <td><img src="${m.photoURL}" class="row-avatar" alt="Avatar" style="width:35px; height:35px; border-radius:50%; object-fit:cover;"></td>
+                <td><strong>${m.name}</strong></td>
+                <td>${m.dob}</td>
+                <td>${m.phone}</td>
+                <td>${m.village}</td>
+                <td>${m.district}</td>
+                <td>${m.country}</td>
+                <td>${m.pastor}</td>
+                <td>${m.createdAt}</td>
+            `;
+        }
         tableBody.appendChild(row);
     });
 }
@@ -101,6 +119,29 @@ window.activatePrintLayout = function(defaultFilter = 'all') {
     document.querySelectorAll('.web-ui-element').forEach(el => el.style.display = 'none');
     document.getElementById("printReportView").style.display = "block";
     window.scrollTo(0, 0);
+
+    // 📱 MOBILE DOUBLE-TAP LISTENER RIGGING
+    const footerLink = document.getElementById("footerLogoLink");
+    if (footerLink) {
+        let lastTapTime = 0;
+        
+        footerLink.addEventListener("click", function(e) {
+            if (e.pointerType === 'touch' || window.matchMedia("(pointer: coarse)").matches) {
+                e.preventDefault();
+            }
+        });
+
+        footerLink.addEventListener("touchend", function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            
+            if (tapLength < 300 && tapLength > 0) {
+                window.open("https://bagendanicholas.github.io/My-website-/index.html", "_blank");
+                e.preventDefault();
+            }
+            lastTapTime = currentTime;
+        });
+    }
 };
 
 // Refactored array processing module with tab states toggles
@@ -210,39 +251,3 @@ function generateCSVFile(arrayData, filename) {
         document.body.removeChild(link);
     }
 }
-window.activatePrintLayout = function(defaultFilter = 'all') {
-    currentPrintFilter = defaultFilter;
-    buildPrintableCards();
-
-    document.querySelectorAll('.web-ui-element').forEach(el => el.style.display = 'none');
-    document.getElementById("printReportView").style.display = "block";
-    window.scrollTo(0, 0);
-
-    // 📱 MOBILE DOUBLE-TAP LISTENER RIGGING
-    const footerLink = document.getElementById("footerLogoLink");
-    if (footerLink) {
-        let lastTapTime = 0;
-        
-        // Prevent default single tap action completely on mobile screens
-        footerLink.addEventListener("click", function(e) {
-            // If it's a simulated touch click, block it. Desktop double clicks work normally.
-            if (e.pointerType === 'touch' || window.matchMedia("(pointer: coarse)").matches) {
-                e.preventDefault();
-            }
-        });
-
-        // Track custom double touch intervals
-        footerLink.addEventListener("touchend", function(e) {
-            const currentTime = new Date().getTime();
-            const tapLength = currentTime - lastTapTime;
-            
-            if (tapLength < 300 && tapLength > 0) {
-                // Success: Direct double tap verified!
-                window.open("https://bagendanicholas.github.io/My-website-/index.html", "_blank");
-                e.preventDefault();
-            }
-            lastTapTime = currentTime;
-        });
-    }
-};
-
