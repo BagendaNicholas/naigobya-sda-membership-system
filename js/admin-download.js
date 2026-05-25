@@ -171,13 +171,15 @@ function buildPrintableCards() {
         return;
     }
 
-    // Loop through records to build row components (Bypasses cascading grid errors)
+    // Loop through records to build card components
     targetDataset.forEach(m => {
         const card = document.createElement("div");
         card.className = "member-print-card";
         
         const isApproved = m.status.toLowerCase() === "approved";
         const badgeStyle = isApproved ? "background:#dcfce7; color:#15803d; border-color:#15803d;" : "background:#fef3c7; color:#b45309; border-color:#b45309;";
+        
+        // Formats the label into a single piece of text to cleanly align and prevent text splits
         const dateLabel = isApproved ? "Baptized Date" : "Registered Date";
         const dateValue = isApproved ? m.dobaptism : m.createdAt;
 
@@ -190,6 +192,7 @@ function buildPrintableCards() {
                 <div class="print-info-row"><span class="print-info-label">Village:</span><span class="print-info-value">${m.village}</span></div>
                 <div class="print-info-row"><span class="print-info-label">District:</span><span class="print-info-value">${m.district}</span></div>
                 <div class="print-info-row"><span class="print-info-label">Church:</span><span class="print-info-value">${m.church}</span></div>
+                <div class="print-info-row"><span class="print-info-label">Pastor:</span><span class="print-info-value">${m.pastor}</span></div>
                 <div class="print-info-row"><span class="print-info-label">${dateLabel}:</span><span class="print-info-value">${dateValue}</span></div>
             </div>
             <span class="print-badge" style="${badgeStyle}">${m.status}</span>
