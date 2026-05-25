@@ -104,6 +104,13 @@ button:hover {
     color: #22c55e;
     font-weight: bold;
 }
+#compressionStatus {
+    display: none;
+    font-size: 0.85rem;
+    color: #22c55e;
+    font-weight: bold;
+    margin-top: 5px;
+}
 @media(max-width:768px) {
     .container {
         margin: 20px;
@@ -182,6 +189,7 @@ button:hover {
     <div class="file-box">
         <label style="color: #cbd5e1; font-size: 0.9rem;">Select Profile Photo</label><br><br>
         <input type="file" id="photo" accept="image/*">
+        <div id="compressionStatus">⚡ Photo optimized automatically!</div>
         <input type="hidden" id="photoBase64String" value="">
     </div>
 
@@ -199,20 +207,22 @@ button:hover {
 </div>
 
 <script>
-// Dynamic Canvas Compressor Engine for Firestore Payload Security
+// Instant Background Canvas Compressor Engine
 const photoInput = document.getElementById("photo");
 const previewImage = document.getElementById("previewImage");
 const base64HiddenInput = document.getElementById("photoBase64String");
+const compressionStatus = document.getElementById("compressionStatus");
 
 photoInput.addEventListener("change", function(){
     const file = this.files[0];
     if (file) {
-        // Enforce user sanity check boundary parameter
-        if (file.size > 3 * 1024 * 1024) { 
-            alert("⚠️ The chosen photo file size is too large. Please select an image under 3MB.");
+        // Safe upper threshold check for file input handling
+        if (file.size > 5 * 1024 * 1024) { 
+            alert("⚠️ The chosen photo file size is too large. Please select an image under 5MB.");
             this.value = "";
             previewImage.style.display = "none";
             base64HiddenInput.value = "";
+            compressionStatus.style.display = "none";
             return;
         }
 
@@ -226,7 +236,7 @@ photoInput.addEventListener("change", function(){
                 let width = img.width;
                 let height = img.height;
                 
-                // Set the maximum profile avatar scale parameters
+                // standard profile photo dimensions
                 const MAX_WIDTH = 400;
                 const MAX_HEIGHT = 400;
                 
@@ -245,17 +255,20 @@ photoInput.addEventListener("change", function(){
                 canvas.width = width;
                 canvas.height = height;
                 
-                // Draw downsampled frame mapping matrix
+                // Render immediately onto background memory layout canvas context
                 const ctx = canvas.getContext("2d");
                 ctx.drawImage(img, 0, 0, width, height);
                 
-                // Render as structured high-density compressed JPEG format payload
+                // Convert instantly to space-saving compressed JPEG text string
                 const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
                 
-                // Feed string arrays downstream to DOM target nodes
+                // Silently cache values for register.js submission handling
                 previewImage.src = compressedBase64;
                 previewImage.style.display = "block";
                 base64HiddenInput.value = compressedBase64;
+                
+                // Show status notification
+                compressionStatus.style.display = "block";
             };
         };
         reader.readAsDataURL(file);
