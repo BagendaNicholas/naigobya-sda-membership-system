@@ -647,3 +647,50 @@ footer p{
     color: black !important;
   }
 }
+/* =========================================================
+   💼 DEVELOPER PRINT ENGINE FOOTER STYLES
+   ========================================================= */
+.print-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40px;
+    padding-top: 15px;
+    border-top: 1px dashed #cbd5e1;
+    text-align: center;
+    page-break-inside: avoid;
+}
+
+.print-footer p {
+    margin: 0 0 8px 0;
+    font-size: 11px;
+    color: #475569;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.developer-footer-logo {
+    height: 45px;
+    width: auto;
+    display: block;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+}
+
+.developer-footer-logo:hover {
+    transform: scale(1.05);
+}
+
+/* Ensure it displays flawlessly on physical paper/PDF versions */
+@media print {
+    .print-footer {
+        display: flex !important;
+        margin-top: 50px !important;
+    }
+    .print-footer p {
+        color: #555555 !important;
+    }
+}
+
