@@ -753,4 +753,47 @@ footer p{
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+/* ==========================================================================
+   🧩 INTERACTIVE FEATURE GRID CARD UPGRADES
+   ========================================================================== */
+.interactive-feature-card {
+  text-decoration: none !important; /* Strips default blue anchor lines */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  cursor: pointer;
+  border: 1px solid #1e293b;
+}
+
+/* Custom header typography setup inside anchors */
+.card-icon-header {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #22c55e;
+  margin-bottom: 12px;
+}
+
+/* Smooth visual transformation lift & glow on hover */
+.interactive-feature-card:hover {
+  transform: translateY(-6px) !important;
+  border-color: #22c55e !important;
+  box-shadow: 0 10px 20px rgba(34, 197, 94, 0.15) !important;
+}
+
+/* Little text hints at the bottom of cards to invite clicks */
+.card-action-hint {
+  display: block;
+  margin-top: 15px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #22c55e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: transform 0.2s ease;
+}
+
+.interactive-feature-card:hover .card-action-hint {
+  transform: translateX(4px); /* Arrow subtly moves right on hover */
+}
 
