@@ -583,7 +583,6 @@ footer p{
 .no-print-actions button {
   width: 100%;
 }
-
 /* ==========================================================================
    🚨 SYSTEM HARDWARE PRINTER OVERRIDES (TRIGGERS DURING PDF SAVE)
    ========================================================================== */
@@ -602,33 +601,59 @@ footer p{
     display: block !important;
   }
   
+  /* Forces the container to stretch and stack cards nicely */
   .print-cards-container {
     display: flex !important;
     flex-direction: column !important;
-    gap: 14px !important;
+    gap: 16px !important;
   }
   
+  /* Structural layout preservation for individual member cards */
   .member-print-card {
     display: flex !important;
+    flex-direction: row !important;
     align-items: flex-start !important;
     background: white !important;
     border: 1px solid #cbd5e1 !important;
-    padding: 14px !important;
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+    page-break-inside: avoid !important;
   }
-  
-  .print-info-row {
+
+  .print-card-details {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-grow: 1 !important;
+  }
+
+  .print-card-header-row {
     display: flex !important;
     justify-content: space-between !important;
+    align-items: center !important;
   }
 
-  .print-info-label {
-    display: inline-block !important;
-    width: 35% !important;
+  /* 👑 LOCKS SIDE-BY-SIDE DOUBLE COLUMNS IN PDF */
+  .print-grid-body {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important; 
+    column-gap: 24px !important;
+    row-gap: 8px !important;
   }
 
-  .print-info-value {
+  .print-grid-cell {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  .full-width-cell {
+    grid-column: span 2 !important;
+  }
+
+  .field-lbl {
     display: inline-block !important;
-    width: 65% !important;
+    width: 65px !important;
+    font-weight: 700 !important;
   }
   
   .print-header {
@@ -636,8 +661,10 @@ footer p{
     align-items: center !important;
   }
 
+  /* Hides interface elements on your dashboard from bleeding onto the PDF page */
   .no-print-actions, 
-  .print-filter-tabs {
+  .print-filter-tabs,
+  .site-global-footer {
     display: none !important;
   }
   
@@ -646,50 +673,84 @@ footer p{
     background: white !important;
     color: black !important;
   }
-}
-/* =========================================================
-   💼 DEVELOPER PRINT ENGINE FOOTER STYLES
-   ========================================================= */
-.print-footer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-top: 40px;
-    padding-top: 15px;
-    border-top: 1px dashed #cbd5e1;
-    text-align: center;
-    page-break-inside: avoid;
+
+  /* Enforces the elegant, minimal report footer at the bottom of the PDF page */
+  .print-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-top: 50px !important;
+    padding-top: 15px !important;
+    border-top: 1px dashed #cbd5e1 !important;
+    text-align: center !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-footer p {
+    color: #475569 !important;
+    font-size: 11px !important;
+    margin: 0 0 8px 0 !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+  }
 }
 
-.print-footer p {
-    margin: 0 0 8px 0;
-    font-size: 11px;
-    color: #475569;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+/* ==========================================================================
+   💼 GLOBAL INTERACTIVE WEB FOOTER STYLES (VISIBLE ON EVERY PAGE)
+   ========================================================================== */
+.site-global-footer {
+  background: #111827; /* Matches dashboard navbar charcoal */
+  text-align: center;
+  padding: 30px 20px;
+  margin-top: 60px;
+  border-top: 1px solid #1e293b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-global-footer p {
+  margin: 0 0 10px 0 !important;
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .developer-footer-logo {
-    height: 45px;
-    width: auto;
-    display: block;
-    transition: transform 0.2s ease;
-    cursor: pointer;
+  height: 45px;
+  width: auto;
+  display: block;
+  transition: transform 0.2s ease;
+  cursor: pointer;
 }
 
 .developer-footer-logo:hover {
-    transform: scale(1.05);
+  transform: scale(1.06); /* Clean interactive pop on hover */
 }
 
-/* Ensure it displays flawlessly on physical paper/PDF versions */
-@media print {
-    .print-footer {
-        display: flex !important;
-        margin-top: 50px !important;
-    }
-    .print-footer p {
-        color: #555555 !important;
-    }
+/* Base style fallback rules for report print-view layout elements */
+.print-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
+  padding-top: 15px;
+  border-top: 1px dashed #cbd5e1;
+  text-align: center;
+  page-break-inside: avoid;
 }
+
+.print-footer p {
+  margin: 0 0 8px 0;
+  font-size: 11px;
+  color: #475569;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
