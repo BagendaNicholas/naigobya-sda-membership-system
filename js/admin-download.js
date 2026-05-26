@@ -69,7 +69,7 @@ async function buildChurchLedgerData() {
     }
 }
 
-// 👑 DYNAMIC RENDERER: Synchronized completely with layout table columns
+// 👑 UPDATED DYNAMIC RENDERER: Synchronized completely with layout table columns
 function renderTableRows(dataset, elementId) {
     const tableBody = document.getElementById(elementId);
     if (!tableBody) return;
@@ -144,7 +144,7 @@ window.activatePrintLayout = function(defaultFilter = 'all') {
     }
 };
 
-// Refactored array processing module to enforce side-by-side grid rendering inside PDFs
+// Refactored array processing module with tab states toggles
 function buildPrintableCards() {
     const cardTargetContainer = document.getElementById("printableMasterCards");
     if (!cardTargetContainer) return;
@@ -179,30 +179,23 @@ function buildPrintableCards() {
         const isApproved = m.status.toLowerCase() === "approved";
         const badgeStyle = isApproved ? "background:#dcfce7; color:#15803d; border-color:#15803d;" : "background:#fef3c7; color:#b45309; border-color:#b45309;";
         
+        // Formats the label into a single piece of text to cleanly align and prevent text splits
         const dateLabel = isApproved ? "Baptized Date" : "Registered Date";
         const dateValue = isApproved ? m.dobaptism : m.createdAt;
 
         card.innerHTML = `
             <img src="${m.photoURL}" class="print-avatar" alt="Profile">
             <div class="print-card-details">
-                <div class="print-card-header-row">
-                    <h4>${m.name}</h4>
-                    <span class="print-badge" style="${badgeStyle}">${m.status}</span>
-                </div>
-                
-                <div class="print-grid-body">
-                    <div class="print-grid-cell"><span class="field-lbl">Phone:</span><span class="field-val">${m.phone}</span></div>
-                    <div class="print-grid-cell"><span class="field-lbl">DOB:</span><span class="field-val">${m.dob}</span></div>
-                    
-                    <div class="print-grid-cell"><span class="field-lbl">Village:</span><span class="field-val">${m.village}</span></div>
-                    <div class="print-grid-cell"><span class="field-lbl">District:</span><span class="field-val">${m.district}</span></div>
-                    
-                    <div class="print-grid-cell"><span class="field-lbl">Church:</span><span class="field-val">${m.church}</span></div>
-                    <div class="print-grid-cell"><span class="field-lbl">Pastor:</span><span class="field-val">${m.pastor}</span></div>
-                    
-                    <div class="print-grid-cell full-width-cell"><span class="field-lbl">${dateLabel}:</span><span class="field-val">${dateValue}</span></div>
-                </div>
+                <h4>${m.name}</h4>
+                <div class="print-info-row"><span class="print-info-label">Phone:</span><span class="print-info-value">${m.phone}</span></div>
+                <div class="print-info-row"><span class="print-info-label">DOB:</span><span class="print-info-value">${m.dob}</span></div>
+                <div class="print-info-row"><span class="print-info-label">Village:</span><span class="print-info-value">${m.village}</span></div>
+                <div class="print-info-row"><span class="print-info-label">District:</span><span class="print-info-value">${m.district}</span></div>
+                <div class="print-info-row"><span class="print-info-label">Church:</span><span class="print-info-value">${m.church}</span></div>
+                <div class="print-info-row"><span class="print-info-label">Pastor:</span><span class="print-info-value">${m.pastor}</span></div>
+                <div class="print-info-row"><span class="print-info-label">${dateLabel}:</span><span class="print-info-value">${dateValue}</span></div>
             </div>
+            <span class="print-badge" style="${badgeStyle}">${m.status}</span>
         `;
         cardTargetContainer.appendChild(card);
     });
