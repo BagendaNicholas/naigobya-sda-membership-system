@@ -264,7 +264,6 @@ textarea{
   margin-top:20px;
 }
 
-/* Injecting structural reinforcement for dynamic injection blocks */
 .member-profile-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
@@ -380,42 +379,35 @@ footer p{
    10. MEDIA QUERY MEDIA RESPONSIVE FLUIDITY
    ========================================================================== */
 @media(max-width:768px){
-
   .navbar{
     flex-direction:column;
     gap:10px;
     padding:15px;
   }
-
   .nav-links{
     justify-content:center;
   }
-
   .nav-links a{
     margin:8px;
   }
-
   .hero h1{
     font-size:38px;
   }
-
   .hero p{
     font-size:17px;
   }
-
   .container{
     padding:15px;
   }
-
   .form-container{
     padding:20px;
   }
-
   .btn,
   button{
     width:100%;
   }
 }
+
 /* ==========================================================================
    11. EXECUTIVE REPORT ENGINE & MOBILE PRINT LAYOUTS
    ========================================================================== */
@@ -606,6 +598,9 @@ footer p{
   width: 100%;
 }
 
+/* ==========================================================================
+   💼 DEVELOPER PRINT ENGINE FOOTER STYLES
+   ========================================================================== */
 .print-footer {
   display: flex;
   flex-direction: column;
@@ -631,10 +626,16 @@ footer p{
   height: 45px;
   width: auto;
   display: block;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.developer-footer-logo:hover {
+  transform: scale(1.05);
 }
 
 /* ==========================================================================
-   🚨 HARDWARE PRINTER FORCE OVERRIDES (FOR THE PERFECT PDF DOWNLOAD)
+   🚨 HARDWARE PRINTER FORCE OVERRIDES (TRIGGERS DURING PDF GENERATION)
    ========================================================================== */
 @media print {
   body {
@@ -718,50 +719,8 @@ footer p{
     display: flex !important;
     margin-top: 50px !important;
   }
-}
-/* =========================================================
-   💼 DEVELOPER PRINT ENGINE FOOTER STYLES
-   ========================================================= */
-.print-footer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-top: 40px;
-    padding-top: 15px;
-    border-top: 1px dashed #cbd5e1;
-    text-align: center;
-    page-break-inside: avoid;
-}
-
-.print-footer p {
-    margin: 0 0 8px 0;
-    font-size: 11px;
-    color: #475569;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.developer-footer-logo {
-    height: 45px;
-    width: auto;
-    display: block;
-    transition: transform 0.2s ease;
-    cursor: pointer;
-}
-
-.developer-footer-logo:hover {
-    transform: scale(1.05);
-}
-
-/* Ensure it displays flawlessly on physical paper/PDF versions */
-@media print {
-    .print-footer {
-        display: flex !important;
-        margin-top: 50px !important;
-    }
-    .print-footer p {
-        color: #555555 !important;
-    }
+  
+  .print-footer p {
+    color: #555555 !important;
+  }
 }
