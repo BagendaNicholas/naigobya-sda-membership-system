@@ -419,8 +419,6 @@ footer p{
 /* ==========================================================================
    11. EXECUTIVE REPORT ENGINE & MOBILE PRINT LAYOUTS
    ========================================================================== */
-
-/* Hide print layout by default in web browsing mode */
 #printReportView {
   display: none;
   background: white;
@@ -429,7 +427,6 @@ footer p{
   min-height: 100vh;
 }
 
-/* Print UI Filter Tabs setup */
 .print-filter-tabs {
   display: flex;
   flex-direction: column;
@@ -457,7 +454,6 @@ footer p{
   border-color: #1e293b !important;
 }
 
-/* Clean Document Banner Header */
 .print-header {
   display: flex;
   align-items: center;
@@ -492,80 +488,106 @@ footer p{
   display: block;
 }
 
-/* Mobile-Friendly Profile Printing Layout Containers */
 .print-cards-container {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
 }
 
+/* --- HARDWARE RESISTANT PRINT CARDS --- */
 .member-print-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 20px !important;
   background: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  border-radius: 8px;
-  padding: 14px;
-  display: flex;
-  align-items: flex-start;
-  gap: 15px;
-  page-break-inside: avoid;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  margin-bottom: 16px !important;
+  page-break-inside: avoid !important;
+  position: relative !important;
 }
 
 .print-avatar {
-  width: 75px;
-  height: 75px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid #334155;
-  flex-shrink: 0;
-  margin-top: 2px;
+  width: 90px !important;
+  height: 90px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  flex-shrink: 0 !important;
+  border: 1px solid #e2e8f0 !important;
 }
 
 .print-card-details {
-  flex-grow: 1;
+  flex-grow: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.print-card-header-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  border-bottom: 1px dashed #cbd5e1 !important;
+  padding-bottom: 6px !important;
+  margin-bottom: 4px !important;
 }
 
 .print-card-details h4 {
-  margin: 0 0 8px 0;
-  font-size: 15px;
-  color: #000000 !important;
-  font-weight: bold;
-  text-transform: uppercase;
-  border-bottom: 1px dashed #cbd5e1;
-  padding-bottom: 4px;
+  margin: 0 !important;
+  font-size: 16px !important;
+  text-transform: uppercase !important;
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
 }
 
-/* Row Architecture Strategy */
-.print-info-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
-  font-size: 12px;
-  color: #222222 !important;
-  border-bottom: 1px solid #f1f5f9;
-  padding-bottom: 2px;
+/* 2-Column Grid Layout Engine */
+.print-grid-body {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  column-gap: 24px !important;
+  row-gap: 8px !important;
 }
 
-.print-info-label {
-  font-weight: bold;
-  color: #555555;
-  width: 35%;
-  flex-shrink: 0;
+.print-grid-cell {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  font-size: 13px !important;
+  border-bottom: 1px dashed #f1f5f9 !important;
+  padding-bottom: 3px !important;
+  color: #334155 !important;
 }
 
-.print-info-value {
-  width: 65%;
-  text-align: left;
+.full-width-cell {
+  grid-column: span 2 !important;
+  border-bottom: none !important;
+}
+
+.field-lbl {
+  font-weight: 700 !important;
+  color: #64748b !important;
+  width: 65px !important;
+  flex-shrink: 0 !important;
+  display: inline-block !important;
+}
+
+.field-val {
+  color: #0f172a !important;
+  font-weight: 500 !important;
 }
 
 .print-badge {
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: bold;
-  text-transform: uppercase;
-  border: 1px solid #000000;
-  align-self: flex-start;
-  flex-shrink: 0;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  padding: 3px 8px !important;
+  border-radius: 6px !important;
+  border: 1px solid !important;
+  display: inline-block !important;
 }
 
 .no-print-actions {
@@ -584,8 +606,35 @@ footer p{
   width: 100%;
 }
 
+.print-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
+  padding-top: 15px;
+  border-top: 1px dashed #cbd5e1;
+  text-align: center;
+  page-break-inside: avoid;
+}
+
+.print-footer p {
+  margin: 0 0 8px 0;
+  font-size: 11px;
+  color: #475569;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.developer-footer-logo {
+  height: 45px;
+  width: auto;
+  display: block;
+}
+
 /* ==========================================================================
-   🚨 SYSTEM HARDWARE PRINTER OVERRIDES (TRIGGERS DURING PDF SAVE)
+   🚨 HARDWARE PRINTER FORCE OVERRIDES (FOR THE PERFECT PDF DOWNLOAD)
    ========================================================================== */
 @media print {
   body {
@@ -602,33 +651,52 @@ footer p{
     display: block !important;
   }
   
+  /* Retains structural integrity inside the Save-As-PDF emulator */
   .print-cards-container {
     display: flex !important;
     flex-direction: column !important;
-    gap: 14px !important;
+    gap: 16px !important;
   }
   
   .member-print-card {
     display: flex !important;
+    flex-direction: row !important;
     align-items: flex-start !important;
     background: white !important;
     border: 1px solid #cbd5e1 !important;
-    padding: 14px !important;
+    padding: 16px !important;
   }
-  
-  .print-info-row {
+
+  .print-card-details {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .print-card-header-row {
     display: flex !important;
     justify-content: space-between !important;
+    align-items: center !important;
   }
 
-  .print-info-label {
-    display: inline-block !important;
-    width: 35% !important;
+  .print-grid-body {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important; /* Locks side-by-side in PDF generation */
+    column-gap: 24px !important;
+    row-gap: 8px !important;
   }
 
-  .print-info-value {
+  .print-grid-cell {
+    display: flex !important;
+    flex-direction: row !important;
+  }
+
+  .full-width-cell {
+    grid-column: span 2 !important;
+  }
+
+  .field-lbl {
     display: inline-block !important;
-    width: 65% !important;
+    width: 65px !important;
   }
   
   .print-header {
@@ -644,7 +712,11 @@ footer p{
   #printReportView {
     padding: 0 !important;
     background: white !important;
-    color: black !important;
+  }
+
+  .print-footer {
+    display: flex !important;
+    margin-top: 50px !important;
   }
 }
 /* =========================================================
