@@ -1,7 +1,8 @@
 // js/dashboard.js
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-import { collection, onSnapshot, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+// 🛠️ FIX: Added getDoc explicitly to the imports below
+import { collection, onSnapshot, updateDoc, doc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
 const LOGGED_ADMIN_EMAIL = "nicholasbagenda@gmail.com";
 let deactivateSnapshotStream = null;
@@ -328,6 +329,7 @@ window.rejectMember = async function (targetDocumentId) {
 };
 
 // 🟢 APPROVE PROFILE CHANGES: Copies values from pendingUpdates object to core fields, then clears queue
+// 🛠️ FIX: Explicitly exposed to 'window' to fix structural HTML execution binding errors
 window.approveProfileChanges = async function (targetDocumentId) {
     try {
         displayUIMessage("⏳ Merging profile changes...", false);
@@ -371,6 +373,7 @@ window.approveProfileChanges = async function (targetDocumentId) {
 };
 
 // 🔴 REJECT PROFILE CHANGES: Deletes the pending payload block safely and returns status to normal
+// 🛠️ FIX: Explicitly exposed to 'window' to fix structural HTML execution binding errors
 window.rejectProfileChanges = async function (targetDocumentId) {
     if (!confirm("Are you sure you want to decline these edits? The profile values will rollback to original metrics.")) return;
     
