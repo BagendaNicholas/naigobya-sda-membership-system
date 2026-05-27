@@ -22,116 +22,111 @@
     <meta name="twitter:title" content="Naigobya SDA Church Portal">
     <meta name="twitter:description" content="Official Congregational Membership Roster Ledger system for Naigobya Seventh-day Adventist Church.">
     <meta name="twitter:image" content="https://sda-naigobya.netlify.app/images/d79f36437e8fdd2dfd483598abf36544.jpg">
-<style>
-    /* Injected layout refinements to natively support expanded spiritual content cards */
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #0f172a;
-        color: white;
-    }
-    .navbar {
-        background: #111827;
-        padding: 15px 8%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .logo {
-        font-size: 20px;
-        font-weight: bold;
-        color: #22c55e;
-    }
-    .nav-links a {
-        color: white;
-        margin-left: 20px;
-        text-decoration: none;
-        font-size: 16px;
-        transition: 0.3s;
-    }
-    .nav-links a:hover { color: #22c55e; }
     
-    .hero {
-        padding: 80px 8%;
-        text-align: center;
-        background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
-    }
-    .hero h1 { font-size: 2.5rem; margin-bottom: 20px; color: white; }
-    .hero p { max-width: 800px; margin: 0 auto 30px auto; color: #94a3b8; line-height: 1.6; }
-    .hero-buttons { display: flex; justify-content: center; gap: 15px; }
-    
-    .btn {
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-weight: bold;
-        text-decoration: none;
-        transition: 0.3s;
-    }
-    .btn.green { background: #22c55e; color: white; }
-    .btn.dark { background: #1e293b; color: white; border: 1px solid #334155; }
-    .btn:hover { opacity: 0.9; }
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: white;
+        }
+        .navbar {
+            background: #111827;
+            padding: 15px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo-block {
+            font-size: 22px;
+            font-weight: bold;
+            color: #22c55e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;          /* Shows pointer to the admin, but looks normal to others */
+            user-select: none;         /* Disables highlighting text on double tap triggers */
+            -webkit-user-select: none;
+        }
+        .nav-links a {
+            color: white;
+            margin-left: 20px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .nav-links a:hover { color: #22c55e; }
+        
+        .hero {
+            padding: 80px 8%;
+            text-align: center;
+            background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+        }
+        .hero h1 { font-size: 2.5rem; margin-bottom: 20px; color: white; }
+        .hero p { max-width: 800px; margin: 0 auto 30px auto; color: #94a3b8; line-height: 1.6; }
+        .hero-buttons { display: flex; justify-content: center; gap: 15px; }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .btn.green { background: #22c55e; color: white; }
+        .btn.dark { background: #1e293b; color: white; border: 1px solid #334155; }
+        .btn:hover { opacity: 0.9; }
 
-    .features, .promises-grid, .prophecy-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 25px;
-        padding: 20px 8% 40px 8%;
-    }
-    .card, .promise-card, .prophecy-card {
-        background: #1e293b;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        border-left: 4px solid #22c55e;
-    }
-    .card h2, .promise-card h3, .prophecy-card h3 { margin-top: 0; color: #22c55e; font-size: 1.25rem; }
-    .card p, .promise-card p, .prophecy-card p { color: #cbd5e1; font-size: 0.9rem; line-height: 1.5; margin-bottom: 0; }
+        .features, .promises-grid, .prophecy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 20px 8% 40px 8%;
+        }
+        .card, .promise-card, .prophecy-card {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            border-left: 4px solid #22c55e;
+        }
+        .card h2, .promise-card h3, .prophecy-card h3 { margin-top: 0; color: #22c55e; font-size: 1.25rem; }
+        .card p, .promise-card p, .prophecy-card p { color: #cbd5e1; font-size: 0.9rem; line-height: 1.5; margin-bottom: 0; }
 
-    .about {
-        padding: 50px 8%;
-        max-width: 900px;
-        margin: 0 auto;
-        text-align: center;
-    }
-    .about h2 { color: #22c55e; font-size: 1.8rem; margin-bottom: 15px; }
-    .about p { color: #cbd5e1; line-height: 1.6; }
-    
-    .scripture-highlight {
-        background: #111827;
-        border: 1px dashed #334155;
-        border-radius: 12px;
-        padding: 30px;
-        margin: 40px 8%;
-        text-align: center;
-    }
-    .scripture-highlight p { font-style: italic; color: #e2e8f0; font-size: 1.1rem; margin-bottom: 10px; }
-    .scripture-highlight span { color: #22c55e; font-weight: bold; font-size: 0.9rem; }
-
-    footer {
-        background: #111827;
-        padding: 30px 8%;
-        text-align: center;
-        border-top: 1px solid #1e293b;
-        font-size: 0.9rem;
-        color: #94a3b8;
-    }
-    footer p { margin: 5px 0; }
-  </style>
+        .about {
+            padding: 50px 8%;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .about h2 { color: #22c55e; font-size: 1.8rem; margin-bottom: 15px; }
+        .about p { color: #cbd5e1; line-height: 1.6; }
+        
+        .scripture-highlight {
+            background: #111827;
+            border: 1px dashed #334155;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px 8%;
+            text-align: center;
+        }
+        .scripture-highlight p { font-style: italic; color: #e2e8f0; font-size: 1.1rem; margin-bottom: 10px; }
+        .scripture-highlight span { color: #22c55e; font-weight: bold; font-size: 0.9rem; }
+    </style>
 </head>
 <body>
 
   <nav class="navbar">
-  <div class="logo-block" style="display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: bold; color: #22c55e;">
-    <img src="images/d79f36437e8fdd2dfd483598abf36544.jpg" alt="SDA Logo" style="height: 35px; width: auto; display: block;">
-    <span>Naigobya SDA</span>
-  </div>
-  <div class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="register.html">Register</a>
-    <a href="login.html">Members</a>
-    <a href="admin-login.html">Admin</a>
-  </div>
-</nav>
+    <div class="logo-block" id="secretAdminLogo">
+      <img src="images/d79f36437e8fdd2dfd483598abf36544.jpg" alt="SDA Logo" style="height: 35px; width: auto; display: block; border-radius: 4px;">
+      <span>Naigobya SDA</span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="register.html">Register</a>
+      <a href="login.html">Members</a>
+      </div>
+  </nav>
 
   <section class="hero">
     <div class="hero-content">
@@ -149,42 +144,28 @@
   </section>
 
   <section class="features web-ui-element">
-  
-  <a href="fellowship.html" class="card interactive-feature-card">
-    <div class="card-icon-header">🙏 Faith & Fellowship</div>
-    <p>
-      Building a united church family through deep spiritual connection, earnest prayer, brotherly love, and active service 
-      to God and the Naigobya community.
-    </p>
-    <span class="card-action-hint">Explore Fellowship →</span>
-  </a>
+    <a href="fellowship.html" class="card interactive-feature-card">
+      <div class="card-icon-header">🙏 Faith & Fellowship</div>
+      <p>Building a united church family through deep spiritual connection, earnest prayer, brotherly love, and active service to God and the Naigobya community.</p>
+      <span class="card-action-hint">Explore Fellowship →</span>
+    </a>
 
-  <a href="leadership.html" class="card interactive-feature-card">
-    <div class="card-icon-header">👨‍💼 Church Leadership</div>
-    <p>
-      Elders, pastors, and church department leaders manage registrations, records, and member 
-      organization responsibly, transparently, and securely.
-    </p>
-    <span class="card-action-hint">Meet Our Leaders →</span>
-  </a>
+    <a href="leadership.html" class="card interactive-feature-card">
+      <div class="card-icon-header">👨‍💼 Church Leadership</div>
+      <p>Elders, pastors, and church department leaders manage registrations, records, and member organization responsibly, transparently, and securely.</p>
+      <span class="card-action-hint">Meet Our Leaders →</span>
+    </a>
 
-  <a href="mission.html" class="card interactive-feature-card">
-    <div class="card-icon-header">📖 Mission & Evangelism</div>
-    <p>
-      Supporting the global SDA mission of spreading the everlasting gospel to all people, kindred, tongue, and nation 
-      through modern digital innovation.
-    </p>
-    <span class="card-action-hint">View Our Mission →</span>
-  </a>
-
-</section>
+    <a href="mission.html" class="card interactive-feature-card">
+      <div class="card-icon-header">📖 Mission & Evangelism</div>
+      <p>Supporting the global SDA mission of spreading the everlasting gospel to all people, kindred, tongue, and nation through modern digital innovation.</p>
+      <span class="card-action-hint">View Our Mission →</span>
+    </a>
+  </section>
 
   <section class="about">
     <h2>📋 Our Sacred Baptismal Covenant</h2>
-    <p>
-      When entering into fellowship at Naigobya SDA Church, members declare their faith and alignment with the global 
-      body of Christ through these sacred vows and spiritual promises:
-    </p>
+    <p>When entering into fellowship at Naigobya SDA Church, members declare their faith and alignment with the global body of Christ through these sacred vows and spiritual promises:</p>
   </section>
 
   <section class="promises-grid">
@@ -244,12 +225,7 @@
 
   <section class="about">
     <h2>Our SDA Commitment</h2>
-    <p>
-      As Seventh-day Adventists, we believe in salvation through grace alone, righteousness by faith in Jesus Christ, obedience 
-      to God's timeless commandments, and preparation for the soon, literal, audible second coming of Christ in the clouds of heaven. 
-      This platform directly supports church ministry, pastoral oversight, membership care, organization, and spiritual unity 
-      within the body of Christ.
-    </p>
+    <p>As Seventh-day Adventists, we believe in salvation through grace alone, righteousness by faith in Jesus Christ, obedience to God's timeless commandments, and preparation for the soon, literal, audible second coming of Christ in the clouds of heaven. This platform directly supports church ministry, pastoral oversight, membership care, organization, and spiritual unity within the body of Christ.</p>
   </section>
 
   <div class="scripture-highlight">
@@ -262,15 +238,43 @@
     <span>— Exodus 20:8-10</span>
   </div>
 
-  <footer>
+  <footer style="background: #111827; padding: 30px 8%; text-align: center; border-top: 1px solid #1e293b; font-size: 0.9rem; color: #94a3b8;">
     <p>© 2026 Naigobya Seventh-day Adventist Church</p>
     <p>Built with faith, prophecy, vision, and technology 💻</p>
   </footer>
-    <footer class="web-ui-element site-global-footer">
+
+  <footer class="web-ui-element site-global-footer">
     <p>System Powered & Maintained By</p>
     <a href="https://bagendanicholas.github.io/My-website-/index.html" id="footerLogoLink" target="_blank">
         <img src="https://raw.githubusercontent.com/BagendaNicholas/naigobya-sda-membership-system/main/images/Mon_21_07_2025_16_26_06.png" class="developer-footer-logo" alt="Nicholas Bagenda Portfolio">
     </a>
-</footer>
-    </body>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const secretLogo = document.getElementById("secretAdminLogo");
+        if (!secretLogo) return;
+
+        let lastTapTime = 0;
+
+        // 💻 Desktop Engine - Double Click Trigger
+        secretLogo.addEventListener("dblclick", function () {
+            window.location.href = "admin-login.html";
+        });
+
+        // 📱 Mobile Phone Engine - Quick Double Tap Trigger
+        secretLogo.addEventListener("touchend", function (e) {
+            const currentTime = new Date().getTime();
+            const tapDelay = currentTime - lastTapTime;
+
+            if (tapDelay < 300 && tapDelay > 0) {
+                e.preventDefault(); 
+                window.location.href = "admin-login.html";
+            }
+            lastTapTime = currentTime;
+        });
+    });
+  </script>
+
+</body>
 </html>
