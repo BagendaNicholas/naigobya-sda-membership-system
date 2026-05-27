@@ -63,11 +63,13 @@
 /* Style wrapper for the list toggle layout controls */
 .toggle-container {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     margin-bottom: 25px;
+    flex-wrap: wrap; /* Keeps page mobile responsive */
 }
 .view-btn {
     flex: 1;
+    min-width: 180px;
     padding: 12px;
     border: none;
     border-radius: 8px;
@@ -75,7 +77,20 @@
     font-weight: bold;
     cursor: pointer;
     color: white;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+/* Live counter badge styling embedded inside button views */
+.badge-indicator {
+    background: #7c2d12;
+    color: #fef3c7;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 800;
 }
 </style>
 </head>
@@ -83,44 +98,47 @@
 
 <div class="navbar">
     <div class="logo" style="display: flex; align-items: center; gap: 10px;">
-        <img src="images/d79f36437e8fdd2dfd483598abf36544.jpg" alt="SDA Logo" style="height: 35px; width: auto; display: block;">
+        <img src="images/d79f36437e8fdd2dfd483598abf36544.jpg" alt="SDA Logo" style="height: 35px; width: auto; display: block; border-radius: 4px;">
         <span>SDA Admin</span>
     </div>
     <div class="nav-links">
         <a href="index.html">Home</a>
         <a href="admin-download.html">Download</a>
-        <a href="#" onclick="logoutAdmin()">Logout</a>
+        <a href="#" id="logoutAdminBtn">Logout</a>
     </div>
 </div>
 
 <div class="container">
     <h2>👨‍💼 Church Admin Dashboard</h2>
 
-    <div id="stats" style="display:grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap:15px; margin-bottom:25px;">
+    <div id="stats" style="display:grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap:15px; margin-bottom:25px;">
         <div class="card">
             <h3 id="totalMembers">0</h3>
             <p>Total Members</p>
         </div>
         <div class="card">
             <h3 id="pendingMembers">0</h3>
-            <p>Pending</p>
+            <p>Pending Apps</p>
         </div>
         <div class="card">
             <h3 id="approvedMembers">0</h3>
-            <p>Approved</p>
+            <p>Approved Roster</p>
         </div>
     </div>
 
     <div class="input-box">
-        <input type="text" id="searchInput" placeholder="Search member by name..." onkeyup="filterMembers()">
+        <input type="text" id="searchInput" placeholder="Search members by name, village, church, phone..." onkeyup="filterMembers()">
     </div>
 
     <div class="toggle-container">
         <button id="viewAllBtn" class="view-btn" style="background: #475569;" onclick="changeDashboardView('all')">
-            👥 All Requests Queue
+            👥 All Registrations
         </button>
         <button id="viewApprovedBtn" class="view-btn" style="background: #1e293b; border: 1px solid rgba(255,255,255,0.1); color: #94a3b8;" onclick="changeDashboardView('approved')">
-            📋 View Approved Roster
+            📋 Approved Roster
+        </button>
+        <button id="viewChangesBtn" class="view-btn" style="background: #1e293b; border: 1px solid rgba(255,255,255,0.1); color: #94a3b8;" onclick="changeDashboardView('pending_changes')">
+            ⚠️ Profile Changes <span class="badge-indicator" id="pendingChangesCount">0</span>
         </button>
     </div>
 
@@ -128,11 +146,24 @@
 </div>
 
 <script type="module" src="js/dashboard.js"></script>
+
+<script type="module">
+    import { logoutAdmin } from "./js/dashboard.js";
+    const logoutBtn = document.getElementById("logoutAdminBtn");
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            logoutAdmin();
+        });
+    }
+</script>
+
 <footer class="web-ui-element site-global-footer">
     <p>System Powered & Maintained By</p>
     <a href="https://bagendanicholas.github.io/My-website-/index.html" id="footerLogoLink" target="_blank">
         <img src="https://raw.githubusercontent.com/BagendaNicholas/naigobya-sda-membership-system/main/images/Mon_21_07_2025_16_26_06.png" class="developer-footer-logo" alt="Nicholas Bagenda Portfolio">
     </a>
-</bo
+</footer>
+
 </body>
 </html>
