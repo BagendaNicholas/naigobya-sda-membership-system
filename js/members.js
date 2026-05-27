@@ -5,6 +5,7 @@ import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.13
 
 const LOGGED_ADMIN_EMAIL = "nicholasbagenda@gmail.com";
 let currentTargetUid = null; 
+let isAdminEditing = false; // Tracks whether the active session belongs to the admin
 
 // 1. WATCH AUTHENTICATION STATE & ROUTE CORRECTLY
 onAuthStateChanged(auth, async (activeUser) => {
@@ -20,32 +21,29 @@ onAuthStateChanged(auth, async (activeUser) => {
 
     // EVALUATION CROSSROADS: Are you the Admin or a Regular Member?
     if (activeUser.email.toLowerCase() === LOGGED_ADMIN_EMAIL.toLowerCase()) {
-        // SCENARIO A: You are the Admin editing someone else
+        isAdminEditing = true;
         if (URL_UID) {
             currentTargetUid = URL_UID;
-            // Unhide the Admin dashboard button if it exists in your navbar layout
             const adminBtn = document.getElementById("adminLink");
             if (adminBtn) adminBtn.style.display = "inline-block";
         } else {
-            // Admin clicked profile without picking a member first
             alert("Admin Mode: Redirecting to Dashboard to pick a member to edit.");
             window.location.href = "admin-dashboard.html";
             return;
         }
     } else {
-        // SCENARIO B: You are a regular member looking at your own portal
+        isAdminEditing = false;
         currentTargetUid = activeUser.uid;
         const adminBtn = document.getElementById("adminLink");
         if (adminBtn) adminBtn.style.display = "none";
     }
 
-    // Fire off the Firestore data retrieval pipeline
     if (currentTargetUid) {
         await loadMemberProfileData(currentTargetUid);
     }
 });
 
-// 2. RETRIEVE DATA FROM FIRESTORE AND POPULATE FIELDS (UPGRADED WITH ALL 10 FIELDS)
+// 2. RETRIEVE DATA FROM FIRESTORE AND POPULATE FIELDS
 async function loadMemberProfileData(uid) {
     try {
         const memberDocRef = doc(db, "members", uid);
@@ -59,7 +57,6 @@ async function loadMemberProfileData(uid) {
 
         const memberData = snapshot.data();
 
-        // Target field mapping safely into your HTML form fields
         if (document.getElementById("welcomeName")) {
             document.getElementById("welcomeName").innerText = memberData.name || "Church Member";
         }
@@ -77,15 +74,26 @@ async function loadMemberProfileData(uid) {
         if (document.getElementById("memberPastor")) document.getElementById("memberPastor").value = memberData.pastor || "";
         if (document.getElementById("memberDobaptism")) document.getElementById("memberDobaptism").value = memberData.dobaptism || "";
 
-        // Handle Status Badges cleanly
+        // Handle Status Badges cleanly (Upgraded to detect "changes_pending")
         const statusBox = document.getElementById("accountStatus");
         if (statusBox) {
             const currentStatus = (memberData.status || "pending").toLowerCase();
-            statusBox.innerText = currentStatus === "approved" ? "Verified Approved" : currentStatus.toUpperCase() + " VERIFICATION";
-            statusBox.className = `status-badge status-${currentStatus}`;
+            
+            if (currentStatus === "changes_pending") {
+                statusBox.innerText = "Changes Pending Verification";
+                statusBox.className = "status-badge status-changes-pending";
+            } else if (currentStatus === "approved") {
+                statusBox.innerText = "Verified Approved";
+                statusBox.className = "status-badge status-approved";
+            } else if (currentStatus === "rejected") {
+                statusBox.innerText = "Rejected Verification";
+                statusBox.className = "status-badge status-rejected";
+            } else {
+                statusBox.innerText = "Pending Verification";
+                statusBox.className = "status-badge status-pending";
+            }
         }
 
-        // Map Base64 avatar strings or apply fallback initials generator if missing
         const avatarImageElement = document.getElementById("displayAvatar");
         if (avatarImageElement) {
             if (memberData.photoURL) {
@@ -101,15 +109,12 @@ async function loadMemberProfileData(uid) {
     }
 }
 
-// 3. LISTEN FOR RE-UPLOADED IMAGE PROFILE CHANGES (CLEANED UP FOR BACKGROUND ENGINE COMPATIBILITY)
-// The HTML script block inside church-members.html handles the heavy background canvas down-sampling.
-// This block safely resets UI states if needed.
+// 3. LISTEN FOR RE-UPLOADED IMAGE PROFILE CHANGES
 const fileSelectorInput = document.getElementById("updatePhoto");
 if (fileSelectorInput) {
     fileSelectorInput.addEventListener("change", function () {
         const selectedFile = this.files[0];
         if (selectedFile) {
-            // Initial safeguard against excessively huge allocations (>5MB)
             if (selectedFile.size > 5 * 1024 * 1024) { 
                 alert("⚠️ Image size is too large. Please keep original photo selections under 5MB.");
                 this.value = "";
@@ -120,7 +125,7 @@ if (fileSelectorInput) {
     });
 }
 
-// 4. TRANSACTION PROFILE WRITE AND UPDATE HANDLER ENGINE (UPGRADED WITH ALL 10 FIELDS)
+// 4. TRANSACTION PROFILE WRITE AND UPDATE HANDLER ENGINE
 const saveBtn = document.getElementById("saveProfileBtn");
 if (saveBtn) {
     saveBtn.addEventListener("click", async () => {
@@ -129,7 +134,6 @@ if (saveBtn) {
             return;
         }
 
-        // Extracting all the updated input variants from the interactive UI layout
         const nameField = document.getElementById("memberName").value.trim();
         const dobField = document.getElementById("memberDob").value;
         const phoneField = document.getElementById("memberPhone").value.trim();
@@ -147,7 +151,6 @@ if (saveBtn) {
         
         const loader = document.getElementById("loadingOverlay");
 
-        // Validation rule validation checks (Ensuring structural inputs are not blank)
         if (!nameField || !dobField || !phoneField || !villageField || !countyField || !districtField || !countryField || !churchField || !areaField || !pastorField || !dobaptismField) {
             alert("⚠️ Modification Denied: All profile data fields must remain fully populated.");
             return;
@@ -156,39 +159,57 @@ if (saveBtn) {
         try {
             if (loader) loader.style.display = "block";
 
-            // Structuring the final write payload mapping object
-            const updateFieldsPayload = {
-                name: nameField,
-                dob: dobField,
-                phone: phoneField,
-                village: villageField,
-                address: villageField, // Fallback legacy alignment hook
-                county: countyField,
-                district: districtField,
-                country: countryField,
-                church: churchField,
-                area: areaField,
-                pastor: pastorField,
-                dobaptism: dobaptismField
-            };
-
-            // Grab the tiny, space-optimized text string from our background cache loop container
-            if (base64PhotoData) {
-                updateFieldsPayload.photoURL = base64PhotoData;
-            }
-
             const databaseTargetRef = doc(db, "members", currentTargetUid);
-            await updateDoc(databaseTargetRef, updateFieldsPayload);
+            let finalPayload = {};
 
-            alert("🎉 Profile records updated successfully!");
-            
-            if (document.getElementById("welcomeName")) {
-                document.getElementById("welcomeName").innerText = nameField;
+            // 🔀 EVALUATION ROUTING POINT
+            if (isAdminEditing) {
+                // Admin Edit: Directly update master data fields
+                finalPayload = {
+                    name: nameField,
+                    dob: dobField,
+                    phone: phoneField,
+                    village: villageField,
+                    address: villageField,
+                    county: countyField,
+                    district: districtField,
+                    country: countryField,
+                    church: churchField,
+                    area: areaField,
+                    pastor: pastorField,
+                    dobaptism: dobaptismField
+                };
+                if (base64PhotoData) finalPayload.photoURL = base64PhotoData;
+                
+                await updateDoc(databaseTargetRef, finalPayload);
+                alert("🎉 Admin Update: Profile records updated instantly inside master files!");
+            } else {
+                // Member Edit: Bundle changes safely into the pendingUpdates queue object
+                finalPayload = {
+                    status: "changes_pending", // Changes badge state active
+                    pendingUpdates: {
+                        name: nameField,
+                        dob: dobField,
+                        phone: phoneField,
+                        village: villageField,
+                        county: countyField,
+                        district: districtField,
+                        country: countryField,
+                        church: churchField,
+                        area: areaField,
+                        pastor: pastorField,
+                        dobaptism: dobaptismField,
+                        timestamp: new Date().toISOString()
+                    }
+                };
+                if (base64PhotoData) finalPayload.pendingUpdates.photoURL = base64PhotoData;
+
+                await updateDoc(databaseTargetRef, finalPayload);
+                alert("⏳ Your changes have been submitted to Church Administration review logs successfully!");
             }
-            
-            // Clean up the optimization alert layout box for clean future interactions
-            const photoStatus = document.getElementById("photoStatus");
-            if (photoStatus) photoStatus.style.display = "none";
+
+            // Force visual sync 
+            window.location.reload();
 
         } catch (writeError) {
             console.error("Firestore submission transmission failed entirely:", writeError);
